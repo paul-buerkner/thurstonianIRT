@@ -150,14 +150,14 @@ make_lavaan_code <- function(data, blocks = NULL) {
 }
 
 #' @export
-fit_TIRT_lavaan <- function(data, blocks = NULL, ...) {
+fit_TIRT_lavaan <- function(data, blocks = NULL, estimator = "ULSMV", ...) {
   data <- make_TIRT_data(data, blocks)
   lavaan_data <- make_sem_data(data)
   lavaan_model <- make_lavaan_code(data)
   lavaan::lavaan(
     lavaan_model, data = lavaan_data, ordered = names(lavaan_data),
     auto.fix.first = FALSE, auto.th = TRUE,
-    parameterization = "theta", estimator = "ULSMV", 
+    parameterization = "theta", estimator = estimator, 
     ...
   )
 }
