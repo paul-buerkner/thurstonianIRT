@@ -1,3 +1,29 @@
+#' Simulate Thurstonian IRT data
+#' 
+#' @param npersons Number of persons
+#' @param ntrait Number of traits
+#' @param gamma intercept parameters
+#' @param lambda item factor loadings
+#' @param psi optional item uniquenesses
+#' @param Phi optional trait correlation matrix
+#' @param eta optional person factor scores
+#' @param nblocks_per_trait Number of blocks per trait
+#' @param nitems_per_block Number of items per block
+#' 
+#' @return A \code{data.frame} of the same structure
+#' as returned by \code{\link{make_TIRT_data}}.
+#' 
+#' @examples 
+#' sdata <- sim_thurstonian_data(
+#'   npersons = 100,
+#'   ntraits = 3,
+#'   nblocks_per_trait = 4,
+#'   gamma = 0,
+#'   lambda = c(runif(6, 0.5, 1), runif(6, -1, -0.5)),
+#'   Phi = diag(3)
+#' )
+#' head(sdata)
+#' 
 #' @export
 sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda, 
                                  psi = NULL, Phi = NULL, eta = NULL, 

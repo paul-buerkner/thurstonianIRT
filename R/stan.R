@@ -1,3 +1,9 @@
+#' Prepare data for Thurstonian IRT models fitted with Stan
+#' 
+#' @inheritParams make_TIRT_data
+#' 
+#' @return A list of data ready to be passed to \pkg{Stan}.
+#' 
 #' @useDynLib thurstonianIRT, .registration = TRUE 
 #' @import Rcpp
 #' @import methods
@@ -57,12 +63,21 @@ make_stan_data <- function(data, blocks = NULL) {
   stan_data
 }
 
+#' Fit Thurstonian IRT models in Stan
+#' 
+#' @inheritParams make_TIRT_data
+#' @param init Initial values of the parameters.
+#' Defaults to \code{0} as it proved to be most stable.
+#' @param ... Further arguments passed to 
+#' \code{\link[rstan:sampling]{rstan::sampling}}.
+#' 
+#' @return A \code{\link[rstan:stanfit-class]{stanfit}} object.
+#' 
 #' @export
 fit_TIRT_stan <- function(data, blocks = NULL, init = 0, ...) {
   data <- make_TIRT_data(data, blocks)
   stan_data <- make_stan_data(data)
   stan_pars = c("Cor_trait", "lambda", "psi", "gamma", "r", "eta")
-  # TODO: fix problems when cores > 1
   rstan::sampling(
     stanmodels$thurstonian_irt_model, 
     data = stan_data, pars = stan_pars, 

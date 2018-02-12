@@ -43,7 +43,7 @@ parameters {
   matrix[N_trait, N_person] z_trait;
   // cholesky factor of correlation matrix of traits
   cholesky_factor_corr[N_trait] L_trait; 
-  vector[N_item] z;  // scaled item random effects
+  vector[N_item] z;  // unscaled random effects
 } 
 transformed parameters { 
   // latent traits per person

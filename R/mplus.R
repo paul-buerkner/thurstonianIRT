@@ -1,3 +1,21 @@
+#' Generate Mplus code for Thurstonian IRT models
+#' 
+#' @inheritParams make_TIRT_data
+#' 
+#' @return A list of Mplus code snippets to be 
+#' interpreted by the \pkg{MplusAutomation} package.
+#' 
+#' @examples 
+#' sdata <- sim_thurstonian_data(
+#'   npersons = 100,
+#'   ntraits = 3,
+#'   nblocks_per_trait = 4,
+#'   gamma = 0,
+#'   lambda = c(runif(6, 0.5, 1), runif(6, -1, -0.5)),
+#'   Phi = diag(3)
+#' )
+#' lapply(make_mplus_code(sdata), cat)
+#' 
 #' @export
 make_mplus_code <- function(data, blocks = NULL, eta_file = "eta.csv") {
   if (!is.TIRTdata(data)) {
