@@ -26,7 +26,7 @@ predict.TIRTfit <- function(object, ...) {
   if (inherits(fit, "stanfit")) {
     out <- summary(fit, "eta")$summary %>%
       as.data.frame() %>%
-      mutate(par = rownames(.data)) %>%
+      tibble::rownames_to_column(var = "par") %>%
       rename(
         estimate = "mean", se = "sd",
         lower_ci = "2.5%", upper_ci = "97.5%"
@@ -47,7 +47,7 @@ predict.TIRTfit <- function(object, ...) {
     }
     ntraits <- ncol(out)
     out <- as.data.frame(out) %>%
-      tidyr::gather("trait", "estimate", names(.data)) %>%
+      tidyr::gather("trait", "estimate", everything()) %>%
       mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
       arrange(.data$id) %>%
       select("id", "trait", "estimate")
