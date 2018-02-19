@@ -78,9 +78,11 @@ fit_TIRT_stan <- function(data, blocks = NULL, init = 0, ...) {
   data <- make_TIRT_data(data, blocks)
   stan_data <- make_stan_data(data)
   stan_pars = c("Cor_trait", "lambda", "psi", "gamma", "r", "eta")
-  rstan::sampling(
+  fit <- rstan::sampling(
     stanmodels$thurstonian_irt_model, 
     data = stan_data, pars = stan_pars, 
     init = init, ...
   )
+  structure(nlist(fit, data), class = "TIRTfit")
 }
+

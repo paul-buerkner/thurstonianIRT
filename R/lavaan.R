@@ -6,12 +6,13 @@
 #' for a Thurstonian IRT model.
 #' 
 #' @examples 
+#' lambdas <- c(runif(6, 0.5, 1), runif(6, -1, -0.5))
 #' sdata <- sim_thurstonian_data(
 #'   npersons = 100,
 #'   ntraits = 3,
 #'   nblocks_per_trait = 4,
 #'   gamma = 0,
-#'   lambda = c(runif(6, 0.5, 1), runif(6, -1, -0.5)),
+#'   lambda = lambdas,
 #'   Phi = diag(3)
 #' )
 #' cat(make_lavaan_code(sdata))
@@ -172,10 +173,11 @@ fit_TIRT_lavaan <- function(data, blocks = NULL, estimator = "ULSMV", ...) {
   data <- make_TIRT_data(data, blocks)
   lavaan_data <- make_sem_data(data)
   lavaan_model <- make_lavaan_code(data)
-  lavaan::lavaan(
+  fit <- lavaan::lavaan(
     lavaan_model, data = lavaan_data, ordered = names(lavaan_data),
     auto.fix.first = FALSE, auto.th = TRUE,
     parameterization = "theta", estimator = estimator, 
     ...
   )
+  structure(nlist(fit, data), class = "TIRTfit")
 }

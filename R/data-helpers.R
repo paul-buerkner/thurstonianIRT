@@ -80,6 +80,7 @@ make_TIRT_data <- function(data, blocks) {
     npersons = npersons, ntraits = ntraits, nblocks = nblocks,
     nitems = nitems, nitems_per_block = nitems_per_block,
     signs = ulapply(blocks, "[[", "signs"), dupl_items = dupl_items,
+    traits = unique(ulapply(blocks, "[[", "traits")),
     class = c("TIRTdata", class(out))
   )
 }

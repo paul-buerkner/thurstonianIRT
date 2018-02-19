@@ -24,12 +24,13 @@ for a Thurstonian IRT model.
 Generate lavaan code for Thurstonian IRT models
 }
 \examples{
+lambdas <- c(runif(6, 0.5, 1), runif(6, -1, -0.5))
 sdata <- sim_thurstonian_data(
   npersons = 100,
   ntraits = 3,
   nblocks_per_trait = 4,
   gamma = 0,
-  lambda = c(runif(6, 0.5, 1), runif(6, -1, -0.5)),
+  lambda = lambdas,
   Phi = diag(3)
 )
 cat(make_lavaan_code(sdata))

@@ -208,24 +208,29 @@ fit_TIRT_mplus <- function(data, blocks = NULL, ...) {
   )
   inp_file <- paste0(file_name, ".inp")
   out_file <- paste0(file_name, ".out")
-  out <- MplusAutomation::mplusModeler(
+  fit <- MplusAutomation::mplusModeler(
     mplus_object, modelout = inp_file,
     run = 1L, writeData = "always", ...
   )
-  out$model_code <- readChar(inp_file, file.info(inp_file)$size)
+  fit$model_code <- readChar(inp_file, file.info(inp_file)$size)
   # cleanup
   unlink(inp_file)
   unlink(paste0(file_name, ".out"))
-  unlink(gsub("\"", "", out$results$input$data$file, fixed = TRUE))
-  unlink(out$results$savedata_info$fileName)
+  unlink(gsub("\"", "", fit$results$input$data$file, fixed = TRUE))
+  unlink(fit$results$savedata_info$fileName)
   # save only the trait scores
   ntraits <- attr(data, "ntraits", TRUE)
-  ncol_save <- ncol(out$results$savedata)
+  ncol_save <- ncol(fit$results$savedata)
   if (is.numeric(ncol_save) && length(ncol_save) > 0) {
     tcols <- (ncol_save - ntraits + 1):ncol_save
-    out$results$savedata <- out$results$savedata[, tcols, drop = FALSE]
+    fit$results$savedata <- fit$results$savedata[, tcols, drop = FALSE]
   }
-  structure(out, class = c("mplusObjectTIRT", class(out)))
+  class(fit) <- c("mplusObjectTIRT", class(fit))
+  structure(nlist(fit, data), class = "TIRTfit")
+}
+
+is.mplusObjectTIRT <- function(x) {
+  inherits(x, "mplusObjectTIRT")
 }
 
 #' @export
@@ -239,9 +244,4 @@ print.mplusObjectTIRT <- function(x, digits = 2, ... ) {
 #' @export
 summary.mplusObjectTIRT <- function(object, ...) {
   object$results$parameters$unstandardized
-}
-
-#' @export
-predict.mplusObjectTIRT <- function(object, ...) {
-  object$results[["savedata"]]   
 }

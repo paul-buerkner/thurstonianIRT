@@ -135,7 +135,8 @@ sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
     npersons = npersons, ntraits = ntraits, nblocks = nblocks,
     nitems = nitems, nblocks_per_trait = nblocks_per_trait, 
     nitems_per_block = nitems_per_block, 
-    signs = sign(lambda), lambda = lambda, psi = psi, eta = eta,
+    signs = sign(lambda), lambda = lambda, psi = psi, eta = eta, 
+    traits = paste0("trait", unique(as.vector(trait_combs))),
     class = c("TIRTdata", class(data))
   )
 }
@@ -178,4 +179,3 @@ lambda2psi <- function(lambda) {
   }
   psi
 }
-
