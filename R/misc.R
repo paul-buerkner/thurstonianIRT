@@ -34,6 +34,15 @@ is_equal <- function(x, y, ...) {
   isTRUE(all.equal(x, y, ...))
 }
 
+#' Set up Correlation Matrices
+#' 
+#' @param cors vector of unique correlations
+#' @param dim Dimension of the correlation matrix
+#' @param dimnames Optional dimnames of the correlation matrix
+#' 
+#' @return A correlation \code{matrix} of dimension \code{dim}. 
+#' 
+#' @export
 cor_matrix <- function(cors, dim, dimnames = NULL) {
   out <- diag(dim)
   out[lower.tri(out)] <- cors
