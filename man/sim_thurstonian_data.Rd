@@ -10,6 +10,8 @@ sim_thurstonian_data(npersons, ntraits, gamma, lambda, psi = NULL,
 \arguments{
 \item{npersons}{Number of persons}
 
+\item{ntraits}{Number of traits}
+
 \item{gamma}{intercept parameters}
 
 \item{lambda}{item factor loadings}
@@ -23,8 +25,6 @@ sim_thurstonian_data(npersons, ntraits, gamma, lambda, psi = NULL,
 \item{nblocks_per_trait}{Number of blocks per trait}
 
 \item{nitems_per_block}{Number of items per block}
-
-\item{ntrait}{Number of traits}
 }
 \value{
 A \code{data.frame} of the same structure

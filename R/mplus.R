@@ -1,6 +1,8 @@
 #' Generate Mplus code for Thurstonian IRT models
 #' 
 #' @inheritParams make_TIRT_data
+#' @param eta_file optional file name in which predicted
+#'   trait scores should be stored.
 #' 
 #' @return A list of Mplus code snippets to be 
 #' interpreted by the \pkg{MplusAutomation} package.
@@ -22,7 +24,7 @@ make_mplus_code <- function(data, blocks = NULL, eta_file = "eta.csv") {
     data <- make_TIRT_data(data, blocks)
   }
   data <- convert_factors(data)
-  data <- filter(data, person == unique(person)[1])
+  data <- filter(data, .data$person == unique(.data$person)[1])
   att <- attributes(data)
   nitems <- att[["nitems"]] 
   nitems_per_block <- att[["nitems_per_block"]]
@@ -192,6 +194,14 @@ make_mplus_code <- function(data, blocks = NULL, eta_file = "eta.csv") {
   )
 }
 
+#' Fit Thurstonian IRT models in Mplus
+#' 
+#' @inheritParams make_TIRT_data
+#' @param ... Further arguments passed to 
+#'   \code{\link[MplusAutomation:mplusModeler]{mplusModeler}}.
+#' 
+#' @return A \code{TIRTfit} object.
+#' 
 #' @export
 fit_TIRT_mplus <- function(data, blocks = NULL, ...) {
   data <- make_TIRT_data(data, blocks)
@@ -241,6 +251,7 @@ print.mplusObjectTIRT <- function(x, digits = 2, ... ) {
   invisible(x)
 }
 
+#' @method summary mplusObjectTIRT
 #' @export
 summary.mplusObjectTIRT <- function(object, ...) {
   object$results$parameters$unstandardized

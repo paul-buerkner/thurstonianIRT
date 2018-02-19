@@ -71,7 +71,7 @@ make_stan_data <- function(data, blocks = NULL) {
 #' @param ... Further arguments passed to 
 #' \code{\link[rstan:sampling]{rstan::sampling}}.
 #' 
-#' @return A \code{\link[rstan:stanfit-class]{stanfit}} object.
+#' @return A \code{TIRTfit} object.
 #' 
 #' @export
 fit_TIRT_stan <- function(data, blocks = NULL, init = 0, ...) {

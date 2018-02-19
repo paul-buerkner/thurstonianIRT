@@ -23,7 +23,7 @@ make_lavaan_code <- function(data, blocks = NULL) {
     data <- make_TIRT_data(data, blocks)
   }
   data <- convert_factors(data)
-  data <- filter(data, person == unique(person)[1])
+  data <- filter(data, .data$person == unique(.data$person)[1])
   att <- attributes(data)
   nitems <- att[["nitems"]] 
   nitems_per_block <- att[["nitems_per_block"]]
@@ -168,6 +168,16 @@ make_lavaan_code <- function(data, blocks = NULL) {
   )
 }
 
+#' Fit Thurstonian IRT models in lavaan
+#' 
+#' @inheritParams make_TIRT_data
+#' @param estimator Name of the estimator that should be used. 
+#'   See \code{\link[lavaan:lavOptions]{lavOptions}}.
+#' @param ... Further arguments passed to 
+#'   \code{\link[lavaan:lavaan]{lavaan}}.
+#' 
+#' @return A \code{TIRTfit} object.
+#' 
 #' @export
 fit_TIRT_lavaan <- function(data, blocks = NULL, estimator = "ULSMV", ...) {
   data <- make_TIRT_data(data, blocks)

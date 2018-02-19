@@ -1,7 +1,7 @@
 #' Simulate Thurstonian IRT data
 #' 
 #' @param npersons Number of persons
-#' @param ntrait Number of traits
+#' @param ntraits Number of traits
 #' @param gamma intercept parameters
 #' @param lambda item factor loadings
 #' @param psi optional item uniquenesses
@@ -24,6 +24,8 @@
 #' )
 #' head(sdata)
 #' 
+#' @importFrom stats sd setNames
+#' @importFrom rlang .data
 #' @export
 sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda, 
                                  psi = NULL, Phi = NULL, eta = NULL, 
@@ -136,7 +138,7 @@ sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
     nitems = nitems, nblocks_per_trait = nblocks_per_trait, 
     nitems_per_block = nitems_per_block, 
     signs = sign(lambda), lambda = lambda, psi = psi, eta = eta, 
-    traits = paste0("trait", unique(as.vector(trait_combs))),
+    traits = paste0("trait", seq_len(ntraits)),
     class = c("TIRTdata", class(data))
   )
 }
@@ -150,7 +152,7 @@ sim_response <- function(data) {
   z <- with(data, 
     (- gamma + lambda1 * eta1 - lambda2 * eta2) / sqrt(psi1^2 + psi2^2)
   )
-  rbinom(length(z), size = 1, prob = pnorm(z))
+  stats::rbinom(length(z), size = 1, prob = stats::pnorm(z))
 }
 
 make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block) {

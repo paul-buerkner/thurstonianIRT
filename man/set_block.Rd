@@ -13,13 +13,13 @@ empty_block()
 \item{items}{Names of item comparisons to be combined 
 into one block. Should correspond to variables in the data.}
 
+\item{traits}{Names of the traits to which each item belongs}
+
 \item{names}{Optional names of the items in the output.
 Can be used to equate parameters of items across blocks,
 if the same item was used in different blocks.}
 
 \item{signs}{Expected signs of the item loadings (1 or -1).}
-
-\item{trait}{Names of the traits to which each item belongs}
 }
 \description{
 Prepare blocks of items and incorporate information

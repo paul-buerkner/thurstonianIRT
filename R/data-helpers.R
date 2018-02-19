@@ -107,11 +107,11 @@ make_sem_data <- function(data, blocks = NULL) {
   nblocks <- att[["nblocks"]]
   ncols <- ntraits * (ntraits - 1) / 2 * nblocks
   data %>% 
-    mutate(itemC = paste0("i", item1, "i", item2)) %>%
-    mutate(itemC = factor(itemC, levels = unique(itemC))) %>%
-    select(person, itemC, response) %>%
-    tidyr::spread(key = itemC, value = response) %>%
-    select(-person)
+    mutate(itemC = paste0("i", .data$item1, "i", .data$item2)) %>%
+    mutate(itemC = factor(.data$itemC, levels = unique(.data$itemC))) %>%
+    select("person", "itemC", "response") %>%
+    tidyr::spread(key = "itemC", value = "response") %>%
+    select(-.data$person)
 }
 
 convert_factors <- function(data) {
@@ -131,7 +131,7 @@ convert_factors <- function(data) {
 #' 
 #' @param items Names of item comparisons to be combined 
 #' into one block. Should correspond to variables in the data.
-#' @param trait Names of the traits to which each item belongs
+#' @param traits Names of the traits to which each item belongs
 #' @param names Optional names of the items in the output.
 #' Can be used to equate parameters of items across blocks,
 #' if the same item was used in different blocks.

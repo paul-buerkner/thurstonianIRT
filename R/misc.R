@@ -34,7 +34,6 @@ is_equal <- function(x, y, ...) {
   isTRUE(all.equal(x, y, ...))
 }
 
-#' @export
 cor_matrix <- function(cors, dim, dimnames = NULL) {
   out <- diag(dim)
   out[lower.tri(out)] <- cors
