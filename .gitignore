@@ -3,3 +3,5 @@
 .RData
 src-x64/
 src-i386/
+src/init.o
+src/thurstonianIRT.dll

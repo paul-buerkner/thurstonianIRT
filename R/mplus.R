@@ -188,7 +188,7 @@ make_mplus_code <- function(data, blocks = NULL, eta_file = "eta.csv") {
       "! trait scores for individuals are estimated and saved in a file"
     ),
     SAVEDATA = collapse_lines(
-      "  FILE IS '", eta_file, "';",
+      paste0("  FILE IS '", eta_file, "';"),
       "  SAVE = FSCORES;"
     )
   )
@@ -229,11 +229,17 @@ fit_TIRT_mplus <- function(data, blocks = NULL, ...) {
   unlink(gsub("\"", "", fit$results$input$data$file, fixed = TRUE))
   unlink(fit$results$savedata_info$fileName)
   # save only the trait scores
-  ntraits <- attr(data, "ntraits", TRUE)
-  ncol_save <- ncol(fit$results$savedata)
+  npersons <- attr(data, "npersons")
+  traits <- attr(data, "traits")
+  trait_scores <- fit$results[["savedata"]]
+  ncol_save <- ncol(trait_scores)
   if (is.numeric(ncol_save) && length(ncol_save) > 0) {
-    tcols <- (ncol_save - ntraits + 1):ncol_save
-    fit$results$savedata <- fit$results$savedata[, tcols, drop = FALSE]
+    tcols <- (ncol_save - length(traits) + 1):ncol_save
+    fit$results$savedata <- trait_scores[, tcols, drop = FALSE]
+  } else {
+    trait_scores <- matrix(NA, ncol = length(traits), nrow = npersons)
+    colnames(trait_scores) <- traits
+    fit$results$savedata <- trait_scores
   }
   class(fit) <- c("mplusObjectTIRT", class(fit))
   structure(nlist(fit, data), class = "TIRTfit")
