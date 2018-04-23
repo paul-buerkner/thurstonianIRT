@@ -132,6 +132,7 @@ sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
     data[take, "eta2"] <- eta[p, pdat$trait2]
   }
   
+  data$prob <- prob_response(data)
   data$response <- sim_response(data)
   structure(data, 
     npersons = npersons, ntraits = ntraits, nblocks = nblocks,
@@ -149,10 +150,15 @@ sim_eta <- function(npersons, Phi) {
 }
 
 sim_response <- function(data) {
+  prob <- prob_response(data)
+  stats::rbinom(length(prob), size = 1, prob = prob)
+}
+
+prob_response <- function(data) {
   z <- with(data, 
     (- gamma + lambda1 * eta1 - lambda2 * eta2) / sqrt(psi1^2 + psi2^2)
   )
-  stats::rbinom(length(z), size = 1, prob = stats::pnorm(z))
+  stats::pnorm(z)
 }
 
 make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block) {
