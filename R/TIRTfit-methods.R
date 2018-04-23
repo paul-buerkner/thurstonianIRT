@@ -36,6 +36,7 @@ predict.TIRTfit <- function(object, ...) {
         col = "par", into = c("par", "id", "trait"),
         regex = "(eta)\\[([[:digit:]]+),([[:digit:]]+)\\]"
       ) %>%
+      mutate(id = as.integer(id)) %>%
       select(-.data$par) %>%
       mutate(trait = as.character(factor(.data$trait, labels = traits))) %>%
       arrange(.data$id) 
