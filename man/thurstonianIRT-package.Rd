@@ -6,7 +6,8 @@
 \alias{thurstonianIRT}
 \title{The 'thurstonianIRT' package.}
 \description{
-A DESCRIPTION OF THE PACKAGE
+This package fits Thurstonian IRT models using Stan,
+lavaan, and Mplus.
 }
 \references{
 Stan Development Team (2018). RStan: the R interface to Stan. R package version 2.17.3. http://mc-stan.org
