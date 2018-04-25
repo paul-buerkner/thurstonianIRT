@@ -1,6 +1,7 @@
 context("Tests for TIRT models fitted with lavaan")
 
 test_that("lavaan code runs without errors", {
+  set.seed(1234)
   lambdas <- c(runif(6, 0.5, 1), runif(6, -1, -0.5))
   sdata <- sim_thurstonian_data(
     npersons = 100,
