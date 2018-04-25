@@ -2,19 +2,22 @@ Package: thurstonianIRT
 Encoding: UTF-8
 Type: Package
 Title: Thurstonian IRT models
-Version: 0.3
-Date: 2018-01-11
+Version: 0.4
+Date: 2018-04-25
 Authors@R: person("Paul-Christian", "Bürkner", email = "paul.buerkner@gmail.com",
   role = c("aut", "cre"))
 Description: Fit Thurstonian IRT models using Stan, lavaan, or Mplus
   behind the scenes.
+License: GPL (>=3)
+LazyData: true
+ByteCompile: true
 Depends: 
-    R (>= 3.3.0), 
-    Rcpp (>= 0.12.14), 
+    R (>= 3.4.0), 
+    Rcpp (>= 0.12.16), 
     methods
 Imports: 
-    rstan (>= 2.17.2), 
-    rstantools (>= 1.4.0),
+    rstan (>= 2.17.3), 
+    rstantools (>= 1.5.0),
     lavaan (>= 0.6-1.1132),
     MplusAutomation,
     dplyr (>= 0.6.0),
@@ -28,13 +31,11 @@ Imports:
 Suggests:
     testthat (>= 0.9.1),
 LinkingTo: 
-    StanHeaders (>= 2.17.1), 
-    rstan (>= 2.17.2), 
-    BH (>= 1.65.0.1), 
-    Rcpp (>= 0.12.14), 
-    RcppEigen (>= 0.3.3.3.1)
-LazyData: true
+    StanHeaders (>= 2.17.2), 
+    rstan (>= 2.17.3), 
+    BH (>= 1.66.0-1), 
+    Rcpp (>= 0.12.16), 
+    RcppEigen (>= 0.3.3.4.0)
+SystemRequirements: GNU make
 NeedsCompilation: yes
-License: GPL (>= 3)
 RoxygenNote: 6.0.1
-
