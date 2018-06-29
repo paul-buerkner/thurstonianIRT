@@ -1,5 +1,5 @@
 #' Simulate Thurstonian IRT data
-#' 
+#'
 #' @param npersons Number of persons
 #' @param ntraits Number of traits
 #' @param gamma intercept parameters
@@ -9,11 +9,18 @@
 #' @param eta optional person factor scores
 #' @param nblocks_per_trait Number of blocks per trait
 #' @param nitems_per_block Number of items per block
-#' 
+#' @param comb_blocks Indicates how to combine traits
+#'   to blocks. \code{"fixed"} implies a simple non-random
+#'   design that may combine certain tratis which each
+#'   other disproportionally often. We thus recommend
+#'   to use a \code{"random"} block design that combines
+#'   all traits with all other traits equally often
+#'   on average.
+#'
 #' @return A \code{data.frame} of the same structure
 #' as returned by \code{\link{make_TIRT_data}}.
-#' 
-#' @examples 
+#'
+#' @examples
 #' sdata <- sim_thurstonian_data(
 #'   npersons = 100,
 #'   ntraits = 3,
@@ -23,18 +30,20 @@
 #'   Phi = diag(3)
 #' )
 #' head(sdata)
-#' 
+#'
 #' @importFrom stats sd setNames
 #' @importFrom rlang .data
 #' @export
-sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda, 
-                                 psi = NULL, Phi = NULL, eta = NULL, 
-                                 nblocks_per_trait = 5, nitems_per_block = 3) {
+sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
+                                 psi = NULL, Phi = NULL, eta = NULL,
+                                 nblocks_per_trait = 5, nitems_per_block = 3,
+                                 comb_blocks = c("fixed", "random")) {
   # prepare data in long format to which responses may be added
   if ((ntraits * nblocks_per_trait) %% nitems_per_block != 0L) {
-    stop("The number of items per block must divide ", 
+    stop("The number of items per block must divide ",
          "the number of total items.")
   }
+  comb_blocks <- match.arg(comb_blocks)
   nblocks <- ntraits * nblocks_per_trait / nitems_per_block
   nitems <- nitems_per_block * nblocks
   ncomparisons <- (nitems_per_block * (nitems_per_block - 1)) / 2
@@ -44,7 +53,10 @@ sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
     comparison = rep(rep(1:ncomparisons, each = npersons), nblocks)
   )
   # select traits for each block
-  trait_combs <- make_trait_combs(ntraits, nblocks_per_trait, nitems_per_block)
+  trait_combs <- make_trait_combs(
+    ntraits, nblocks_per_trait, nitems_per_block,
+    comb_blocks = comb_blocks
+  )
   items_per_trait <- vector("list", ntraits)
   for (i in seq_len(nblocks)) {
     traits <- trait_combs[i, ]
@@ -57,11 +69,11 @@ sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
     fblock <- (i - 1) * nitems_per_block
     item1 <- match(trait1, traits) + fblock
     item2 <- match(trait2, traits) + fblock
-    comparison <- data[data$block == i, ]$comparison 
+    comparison <- data[data$block == i, ]$comparison
     data[data$block == i, "itemC"] <- comparison + fblock
-    data[data$block == i, "trait1"] <- trait1[comparison] 
-    data[data$block == i, "trait2"] <- trait2[comparison] 
-    data[data$block == i, "item1"] <- item1[comparison] 
+    data[data$block == i, "trait1"] <- trait1[comparison]
+    data[data$block == i, "trait2"] <- trait2[comparison]
+    data[data$block == i, "item1"] <- item1[comparison]
     data[data$block == i, "item2"] <- item2[comparison]
     # save item numbers per trait
     for (t in unique(trait1)) {
@@ -75,14 +87,14 @@ sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
       )
     }
   }
-  
+
   # prepare parameters
   if (is.null(eta)) {
     eta <- sim_eta(npersons, Phi)
   }
   if (length(gamma) == 1L) {
     gamma <- rep(gamma, ncomparisons * nblocks)
-  } 
+  }
   if (!is.list(lambda) && length(lambda) == 1L) {
     lambda <- rep(lambda, nitems)
   }
@@ -103,7 +115,7 @@ sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
   }
   dim_eta_exp <- c(length(unique(data$person)), ntraits)
   if (!is_equal(dim(eta), dim_eta_exp)) {
-    stop("eta should be of dimension (", dim_eta_exp[1], 
+    stop("eta should be of dimension (", dim_eta_exp[1],
          ", ", dim_eta_exp[2], ").")
   }
   data$gamma <- gamma[data$comparison]
@@ -131,14 +143,14 @@ sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
     data[take, "eta1"] <- eta[p, pdat$trait1]
     data[take, "eta2"] <- eta[p, pdat$trait2]
   }
-  
+
   data$prob <- prob_response(data)
   data$response <- sim_response(data)
-  structure(data, 
+  structure(data,
     npersons = npersons, ntraits = ntraits, nblocks = nblocks,
-    nitems = nitems, nblocks_per_trait = nblocks_per_trait, 
-    nitems_per_block = nitems_per_block, 
-    signs = sign(lambda), lambda = lambda, psi = psi, eta = eta, 
+    nitems = nitems, nblocks_per_trait = nblocks_per_trait,
+    nitems_per_block = nitems_per_block,
+    signs = sign(lambda), lambda = lambda, psi = psi, eta = eta,
     traits = paste0("trait", seq_len(ntraits)),
     class = c("TIRTdata", class(data))
   )
@@ -155,17 +167,54 @@ sim_response <- function(data) {
 }
 
 prob_response <- function(data) {
-  z <- with(data, 
+  z <- with(data,
     (- gamma + lambda1 * eta1 - lambda2 * eta2) / sqrt(psi1^2 + psi2^2)
   )
   stats::pnorm(z)
 }
 
-make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block) {
-  # TODO: improve design balance
+make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
+                             comb_blocks = c("fixed", "random")) {
+  comb_blocks <- match.arg(comb_blocks)
   stopifnot((ntraits * nblocks_per_trait) %% nitems_per_block == 0L)
-  traits <- rep(seq_len(ntraits), nblocks_per_trait)
-  matrix(traits, ncol = nitems_per_block, byrow = TRUE)
+  if (comb_blocks == "fixed") {
+    # use comb_blocks == "random" for a better balanced design
+    traits <- rep(seq_len(ntraits), nblocks_per_trait)
+    out <- matrix(traits, ncol = nitems_per_block, byrow = TRUE)
+  } else if (comb_blocks == "random") {
+    nblocks <- (ntraits * nblocks_per_trait) %/% nitems_per_block
+    traits <- seq_len(ntraits)
+    out <- replicate(nitems_per_block, traits, simplify = FALSE)
+    out <- as.matrix(expand.grid(out))
+    rownames(out) <- NULL
+    remove <- rep(FALSE, nrow(out))
+    for (i in seq_len(nrow(out))) {
+      if (length(unique(out[i, ])) < ncol(out)) {
+        remove[i] <- TRUE
+      }
+    }
+    out <- out[!remove, ]
+    possible_rows <- seq_len(nrow(out))
+    nbpt_chosen <- rep(0, ntraits)
+    chosen <- rep(NA, nblocks)
+    i <- 1
+    while (i <= nblocks) {
+      chosen[i] <- possible_rows[sample(seq_along(possible_rows), 1)]
+      traits_chosen <- out[chosen[i], ]
+      nbpt_chosen[traits_chosen] <- nbpt_chosen[traits_chosen] + 1
+      valid <- max(nbpt_chosen) <= min(nbpt_chosen) + 1 &&
+        !any(nbpt_chosen[traits_chosen] > nblocks_per_trait)
+      if (valid) {
+        possible_rows <- possible_rows[-chosen[i]]
+        i <- i + 1
+      } else {
+        # revert number of blocks per trait chosen
+        nbpt_chosen[traits_chosen] <- nbpt_chosen[traits_chosen] - 1
+      }
+    }
+    out <- out[chosen, ]
+  }
+  out
 }
 
 lambda2psi <- function(lambda) {

@@ -5,7 +5,8 @@
 \title{Simulate Thurstonian IRT data}
 \usage{
 sim_thurstonian_data(npersons, ntraits, gamma, lambda, psi = NULL,
-  Phi = NULL, eta = NULL, nblocks_per_trait = 5, nitems_per_block = 3)
+  Phi = NULL, eta = NULL, nblocks_per_trait = 5, nitems_per_block = 3,
+  comb_blocks = c("fixed", "random"))
 }
 \arguments{
 \item{npersons}{Number of persons}
@@ -25,6 +26,14 @@ sim_thurstonian_data(npersons, ntraits, gamma, lambda, psi = NULL,
 \item{nblocks_per_trait}{Number of blocks per trait}
 
 \item{nitems_per_block}{Number of items per block}
+
+\item{comb_blocks}{Indicates how to combine traits
+to blocks. \code{"fixed"} implies a simple non-random
+design that may combine certain tratis which each
+other disproportionally often. We thus recommend
+to use a \code{"random"} block design that combines
+all traits with all other traits equally often
+on average.}
 }
 \value{
 A \code{data.frame} of the same structure
