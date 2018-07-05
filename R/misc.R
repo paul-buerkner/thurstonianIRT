@@ -20,7 +20,7 @@ collapse <- function(..., sep = "") {
   paste(..., sep = sep, collapse = "")
 }
 
-is_wholenumber <- function(x, tol = .Machine$double.eps) {  
+is_wholenumber <- function(x, tol = .Machine$double.eps) {
   # check if x is a whole number (integer)
   if (!is.numeric(x)) {
     out <- FALSE
@@ -35,13 +35,13 @@ is_equal <- function(x, y, ...) {
 }
 
 #' Set up Correlation Matrices
-#' 
+#'
 #' @param cors vector of unique correlations
 #' @param dim Dimension of the correlation matrix
 #' @param dimnames Optional dimnames of the correlation matrix
-#' 
-#' @return A correlation \code{matrix} of dimension \code{dim}. 
-#' 
+#'
+#' @return A correlation \code{matrix} of dimension \code{dim}.
+#'
 #' @export
 cor_matrix <- function(cors, dim, dimnames = NULL) {
   out <- diag(dim)
@@ -63,7 +63,7 @@ nlist <- function(...) {
   m <- match.call()
   dots <- list(...)
   no_names <- is.null(names(dots))
-  has_name <- if (no_names) FALSE 
+  has_name <- if (no_names) FALSE
   else nzchar(names(dots))
   if (all(has_name)) return(dots)
   nms <- as.character(m)[-1]
@@ -97,3 +97,13 @@ named_list <- function(names, values = NULL) {
   setNames(values, names)
 }
 
+as_one_numeric <- function(x, allow_na = FALSE) {
+  # coerce 'x' to a signle number value
+  s <- substitute(x)
+  x <- suppressWarnings(as.numeric(x))
+  if (length(x) != 1L || anyNA(x) && !allow_na) {
+    s <- substr(deparse_combine(s), 1L, 100L)
+    stop2("Cannot coerce ", s, " to a single numeric value.")
+  }
+  x
+}
