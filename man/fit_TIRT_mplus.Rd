@@ -16,7 +16,7 @@ which items belong to which block, trait and more.
 Ignored if data already contains information on 
 the blocks.}
 
-\item{...}{Further arguments passed to 
+\item{...}{Further arguments passed to
 \code{\link[MplusAutomation:mplusModeler]{mplusModeler}}.}
 }
 \value{

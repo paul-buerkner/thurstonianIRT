@@ -4,7 +4,7 @@
 \alias{make_mplus_code}
 \title{Generate Mplus code for Thurstonian IRT models}
 \usage{
-make_mplus_code(data, blocks = NULL, eta_file = "eta.csv")
+make_mplus_code(data, blocks = NULL, iter = 1000, eta_file = "eta.csv")
 }
 \arguments{
 \item{data}{An object of class \code{data.frame} 
@@ -20,7 +20,7 @@ the blocks.}
 trait scores should be stored.}
 }
 \value{
-A list of Mplus code snippets to be 
+A list of Mplus code snippets to be
 interpreted by the \pkg{MplusAutomation} package.
 }
 \description{
