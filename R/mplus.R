@@ -21,6 +21,7 @@
 #' @export
 make_mplus_code <- function(data, blocks = NULL, iter = 1000,
                             eta_file = "eta.csv") {
+  # TODO: make better interface to Mplus' control parameters
   iter <- round(as_one_numeric(iter))
   if (!is.TIRTdata(data)) {
     data <- make_TIRT_data(data, blocks)
@@ -211,7 +212,7 @@ fit_TIRT_mplus <- function(data, blocks = NULL, ...) {
   file_name <- collapse(sample(0:9, 10, TRUE))
   mplus_data <- make_sem_data(data)
   mplus_model <- make_mplus_code(
-    data, eta_file = paste0(file_name, ".csv")
+    data, eta_file = paste0(file_name, ".csv"), ...
   )
   mplus_object <- suppressMessages(
     do.call(
@@ -223,7 +224,7 @@ fit_TIRT_mplus <- function(data, blocks = NULL, ...) {
   out_file <- paste0(file_name, ".out")
   fit <- MplusAutomation::mplusModeler(
     mplus_object, modelout = inp_file,
-    run = 1L, writeData = "always", ...
+    run = 1L, writeData = "always"
   )
   fit$model_code <- readChar(inp_file, file.info(inp_file)$size)
   # cleanup
@@ -253,7 +254,7 @@ is.mplusObjectTIRT <- function(x) {
 }
 
 #' @export
-print.mplusObjectTIRT <- function(x, digits = 2, ... ) {
+print.mplusObjectTIRT <- function(x, digits = 2, ...) {
   cat("Model Name:", x$TITLE, "\n")
   cat("Results:\n")
   print(x$results$parameters$unstandardized, digits = digits)
