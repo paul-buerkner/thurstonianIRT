@@ -17,6 +17,9 @@ which items belong to which block, trait and more.
 Ignored if data already contains information on 
 the blocks.}
 
+\item{iter}{Maximum number of iterations of the
+model fitting algorithm.}
+
 \item{eta_file}{optional file name in which predicted
 trait scores should be stored.}
 }

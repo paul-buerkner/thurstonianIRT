@@ -103,7 +103,16 @@ as_one_numeric <- function(x, allow_na = FALSE) {
   x <- suppressWarnings(as.numeric(x))
   if (length(x) != 1L || anyNA(x) && !allow_na) {
     s <- substr(deparse_combine(s), 1L, 100L)
-    stop2("Cannot coerce ", s, " to a single numeric value.")
+    stop("Cannot coerce ", s, " to a single numeric value.")
   }
   x
+}
+
+deparse_combine <- function(x, max_char = 100) {
+  # combine deparse lines into one string
+  out <- collapse(deparse(x))
+  if (isTRUE(max_char > 0)) {
+    out <- substr(out, 1, max_char)
+  }
+  out
 }

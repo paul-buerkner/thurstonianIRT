@@ -3,6 +3,8 @@
 #' @inheritParams make_TIRT_data
 #' @param eta_file optional file name in which predicted
 #'   trait scores should be stored.
+#' @param iter Maximum number of iterations of the
+#'   model fitting algorithm.
 #'
 #' @return A list of Mplus code snippets to be
 #' interpreted by the \pkg{MplusAutomation} package.
