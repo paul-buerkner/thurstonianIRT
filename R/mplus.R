@@ -8,7 +8,7 @@
 #' interpreted by the \pkg{MplusAutomation} package.
 #'
 #' @examples
-#' sdata <- sim_thurstonian_data(
+#' sdata <- sim_TIRT_data(
 #'   npersons = 100,
 #'   ntraits = 3,
 #'   nblocks_per_trait = 4,

@@ -16,10 +16,10 @@ which items belong to which block, trait and more.
 Ignored if data already contains information on 
 the blocks.}
 
-\item{estimator}{Name of the estimator that should be used. 
+\item{estimator}{Name of the estimator that should be used.
 See \code{\link[lavaan:lavOptions]{lavOptions}}.}
 
-\item{...}{Further arguments passed to 
+\item{...}{Further arguments passed to
 \code{\link[lavaan:lavaan]{lavaan}}.}
 }
 \value{

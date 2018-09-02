@@ -4,7 +4,8 @@
 \alias{make_mplus_code}
 \title{Generate Mplus code for Thurstonian IRT models}
 \usage{
-make_mplus_code(data, blocks = NULL, iter = 1000, eta_file = "eta.csv")
+make_mplus_code(data, blocks = NULL, iter = 1000,
+  eta_file = "eta.csv")
 }
 \arguments{
 \item{data}{An object of class \code{data.frame} 
@@ -27,7 +28,7 @@ interpreted by the \pkg{MplusAutomation} package.
 Generate Mplus code for Thurstonian IRT models
 }
 \examples{
-sdata <- sim_thurstonian_data(
+sdata <- sim_TIRT_data(
   npersons = 100,
   ntraits = 3,
   nblocks_per_trait = 4,

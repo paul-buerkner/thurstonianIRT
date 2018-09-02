@@ -1,27 +1,33 @@
 #' Simulate Thurstonian IRT data
 #'
-#' @param npersons Number of persons
-#' @param ntraits Number of traits
-#' @param gamma intercept parameters
-#' @param lambda item factor loadings
-#' @param psi optional item uniquenesses
-#' @param Phi optional trait correlation matrix
-#' @param eta optional person factor scores
-#' @param nblocks_per_trait Number of blocks per trait
-#' @param nitems_per_block Number of items per block
-#' @param comb_blocks Indicates how to combine traits
-#'   to blocks. \code{"fixed"} implies a simple non-random
-#'   design that may combine certain tratis which each
-#'   other disproportionally often. We thus recommend
-#'   to use a \code{"random"} block design that combines
-#'   all traits with all other traits equally often
-#'   on average.
+#' @param npersons Number of persons.
+#' @param ntraits Number of traits.
+#' @param lambda Item factor loadings.
+#' @param gamma Baseline attractiveness parameters of the
+#'   first item versus the second item in the pairwise comparisons.
+#'   Can be thought of as intercept parameters.
+#' @param psi Optional item uniquenesses. If not provided,
+#'   they will be computed as \code{psi = 1 - lambda^2} in which
+#'   case lambda are taken to be the standardized factor loadings.
+#' @param Phi Optional trait correlation matrix from which to sample
+#'   person factor scores. Only used if \code{eta} is not provided.
+#' @param eta Optional person factor scores. If provided, argument
+#'   \code{Phi} will be ignored.
+#' @param nblocks_per_trait Number of blocks per trait.
+#' @param nitems_per_block Number of items per block.
+#' @param comb_blocks Indicates how to combine traits to blocks.
+#'   \code{"fixed"} implies a simple non-random design that may combine
+#'   certain tratis which each other disproportionally often. We thus
+#'   recommend to use a \code{"random"} block design (the default) that
+#'   combines all traits with all other traits equally often on average.
 #'
 #' @return A \code{data.frame} of the same structure
-#' as returned by \code{\link{make_TIRT_data}}.
+#' as returned by \code{\link{make_TIRT_data}}. Parameter values
+#' from which the data were simulated are stored as attributes
+#' of the returned object.
 #'
 #' @examples
-#' sdata <- sim_thurstonian_data(
+#' sdata <- sim_TIRT_data(
 #'   npersons = 100,
 #'   ntraits = 3,
 #'   nblocks_per_trait = 4,
@@ -30,14 +36,15 @@
 #'   Phi = diag(3)
 #' )
 #' head(sdata)
+#' str(attributes(sdata))
 #'
 #' @importFrom stats sd setNames
 #' @importFrom rlang .data
 #' @export
-sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
-                                 psi = NULL, Phi = NULL, eta = NULL,
-                                 nblocks_per_trait = 5, nitems_per_block = 3,
-                                 comb_blocks = c("fixed", "random")) {
+sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
+                          psi = NULL, Phi = NULL, eta = NULL,
+                          nblocks_per_trait = 5, nitems_per_block = 3,
+                          comb_blocks = c("random", "fixed")) {
   # prepare data in long format to which responses may be added
   if ((ntraits * nblocks_per_trait) %% nitems_per_block != 0L) {
     stop("The number of items per block must divide ",
@@ -99,7 +106,7 @@ sim_thurstonian_data <- function(npersons, ntraits, gamma, lambda,
     lambda <- rep(lambda, nitems)
   }
   if (is.null(psi)) {
-    message("Computing standardized psi^2 as 1 - lambda^2")
+    message("Computing standardized psi as 1 - lambda^2")
     psi <- lambda2psi(lambda)
   } else if (!is.list(psi) && length(psi) == 1L) {
     psi <- rep(psi, nitems)
