@@ -67,21 +67,21 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
   items_per_trait <- vector("list", ntraits)
   for (i in seq_len(nblocks)) {
     traits <- trait_combs[i, ]
-    trait1 <- rep(
-      traits[1:(nitems_per_block - 1)], (nitems_per_block - 1):1
-    )
-    trait2 <- unlist(lapply(
-      2:nitems_per_block, function(x) traits[x:nitems_per_block]
-    ))
+    trait1 <- rep_comp(traits, 1, nitems_per_block)
+    trait2 <- rep_comp(traits, 2, nitems_per_block)
     fblock <- (i - 1) * nitems_per_block
     item1 <- match(trait1, traits) + fblock
     item2 <- match(trait2, traits) + fblock
+    sign1 <- sign(lambda[item1])
+    sign2 <- sign(lambda[item2])
     comparison <- data[data$block == i, ]$comparison
     data[data$block == i, "itemC"] <- comparison + fblock
     data[data$block == i, "trait1"] <- trait1[comparison]
     data[data$block == i, "trait2"] <- trait2[comparison]
     data[data$block == i, "item1"] <- item1[comparison]
     data[data$block == i, "item2"] <- item2[comparison]
+    data[data$block == i, "sign1"] <- sign1[comparison]
+    data[data$block == i, "sign2"] <- sign2[comparison]
     # save item numbers per trait
     for (t in unique(trait1)) {
       items_per_trait[[t]] <- union(

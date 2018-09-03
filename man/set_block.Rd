@@ -10,7 +10,7 @@ set_block(items, traits, names = items, signs = 1)
 empty_block()
 }
 \arguments{
-\item{items}{Names of item comparisons to be combined 
+\item{items}{Names of item comparisons to be combined
 into one block. Should correspond to variables in the data.}
 
 \item{traits}{Names of the traits to which each item belongs}
@@ -29,7 +29,7 @@ about which item belongs to which trait
 set_block(
   items = c("i1i2", "i1i3", "i2i3"),
   traits = c("A", "B", "C")
-) + 
+) +
 set_block(
   items = c("i4i5", "i4i6", "i5i6"),
   traits = c("A", "B", "C")
