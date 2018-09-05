@@ -203,21 +203,37 @@ make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
     out <- out[!remove, ]
     possible_rows <- seq_len(nrow(out))
     nbpt_chosen <- rep(0, ntraits)
-    chosen <- rep(NA, nblocks)
-    i <- 1
-    while (i <= nblocks) {
-      chosen[i] <- possible_rows[sample(seq_along(possible_rows), 1)]
-      traits_chosen <- out[chosen[i], ]
-      nbpt_chosen[traits_chosen] <- nbpt_chosen[traits_chosen] + 1
-      valid <- max(nbpt_chosen) <= min(nbpt_chosen) + 1 &&
-        !any(nbpt_chosen[traits_chosen] > nblocks_per_trait)
-      if (valid) {
-        possible_rows <- possible_rows[-chosen[i]]
-        i <- i + 1
-      } else {
-        # revert number of blocks per trait chosen
-        nbpt_chosen[traits_chosen] <- nbpt_chosen[traits_chosen] - 1
+
+    .choose <- function(nblocks, maxtrys = 20 * nblocks) {
+      # finds suitable blocks
+      chosen <- rep(NA, nblocks)
+      i <- ntrys <- 1
+      while (i <= nblocks && ntrys <= maxtrys) {
+        ntrys <- ntrys + 1
+        chosen[i] <- possible_rows[sample(seq_along(possible_rows), 1)]
+        traits_chosen <- out[chosen[i], ]
+        nbpt_chosen[traits_chosen] <- nbpt_chosen[traits_chosen] + 1
+        valid <- max(nbpt_chosen) <= min(nbpt_chosen) + 1 &&
+          !any(nbpt_chosen[traits_chosen] > nblocks_per_trait)
+        if (valid) {
+          possible_rows <- possible_rows[-chosen[i]]
+          i <- i + 1
+        } else {
+          # revert number of blocks per trait chosen
+          nbpt_chosen[traits_chosen] <- nbpt_chosen[traits_chosen] - 1
+        }
       }
+      return(chosen)
+    }
+
+    i <- 1
+    chosen <- rep(NA, nblocks)
+    while (anyNA(chosen) && i <= 20) {
+      i <- i + 1
+      chosen <- .choose(nblocks)
+    }
+    if (anyNA(chosen)) {
+      stop("Could not find a set of suitable blocks.")
     }
     out <- out[chosen, ]
   }
