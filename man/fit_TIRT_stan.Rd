@@ -19,7 +19,7 @@ the blocks.}
 \item{init}{Initial values of the parameters.
 Defaults to \code{0} as it proved to be most stable.}
 
-\item{...}{Further arguments passed to 
+\item{...}{Further arguments passed to
 \code{\link[rstan:sampling]{rstan::sampling}}.}
 }
 \value{

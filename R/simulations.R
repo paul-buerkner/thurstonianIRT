@@ -111,8 +111,8 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
   } else if (!is.list(psi) && length(psi) == 1L) {
     psi <- rep(psi, nitems)
   }
-  if (length(gamma) != ncomparisons * nblocks) {
-    stop("gamma should contain ", ncomparisons * nblocks, " values.")
+  if (NROW(gamma) != ncomparisons * nblocks) {
+    stop("gamma should contain ", ncomparisons * nblocks, " rows.")
   }
   if (sum(lengths(lambda)) != nitems) {
     stop("lambda should contain ", nitems, " values.")
@@ -125,7 +125,11 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
     stop("eta should be of dimension (", dim_eta_exp[1],
          ", ", dim_eta_exp[2], ").")
   }
-  data$gamma <- gamma[data$comparison]
+  if (NCOL(gamma) > 1L) {
+    data$gamma <- gamma[data$comparison, , drop = FALSE]
+  } else {
+    data$gamma <- gamma[data$comparison]
+  }
   if (is.list(lambda)) {
     if (length(lambda) != ntraits) {
       stop("lambda should contain ", ntraits, " list elements.")
@@ -152,7 +156,7 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
   }
 
   data$prob <- prob_response(data)
-  data$response <- sim_response(data)
+  data$response <- sim_response(data$prob)
   structure(data,
     npersons = npersons, ntraits = ntraits, nblocks = nblocks,
     nitems = nitems, nblocks_per_trait = nblocks_per_trait,
@@ -168,16 +172,45 @@ sim_eta <- function(npersons, Phi) {
   mnormt::rmnorm(npersons, mu, Phi)
 }
 
-sim_response <- function(data) {
-  prob <- prob_response(data)
-  stats::rbinom(length(prob), size = 1, prob = prob)
+sim_response <- function(prob) {
+  # Args:
+  #   prob: vector or matrix of category probabilities
+  stopifnot(NCOL(prob) > 0L)
+  if (NCOL(prob) == 1L) {
+    out <- stats::rbinom(length(prob), size = 1, prob = prob)
+  } else {
+    cats <- seq_len(NCOL(prob)) - 1
+    out <- apply(prob, 1, function(p) sample(cats, 1, prob = p))
+  }
+  out
 }
 
+#' @importFrom stats pnorm
 prob_response <- function(data) {
-  z <- with(data,
-    (- gamma + lambda1 * eta1 - lambda2 * eta2) / sqrt(psi1^2 + psi2^2)
-  )
-  stats::pnorm(z)
+  # compute category probabilities
+  ncat <- NCOL(data$gamma) + 1
+  stopifnot(ncat > 1L)
+  if (ncat == 2L) {
+    # dichotomous model
+    mu <- with(data,
+      (-gamma + lambda1 * eta1 - lambda2 * eta2) /
+        sqrt(psi1^2 + psi2^2)
+    )
+    out <- pnorm(mu)
+  } else {
+    # ordinal model
+    sum_psi <- with(data, sqrt(psi1^2 + psi2^2))
+    mu <- with(data, lambda1 * eta1 - lambda2 * eta2) / sum_psi
+    out <- matrix(ncol = ncat, nrow = length(mu))
+    std_gamma <- data$gamma / sum_psi
+    out[, 1] <- pnorm(std_gamma[, 1] - mu)
+    out[, ncat] <- 1 - pnorm(std_gamma[, ncat - 1] - mu)
+    for (i in seq_len(ncat)[-c(1, ncat)]) {
+      out[, i] <- pnorm(std_gamma[, i] - mu) -
+        pnorm(std_gamma[, i - 1] - mu)
+    }
+  }
+  out
 }
 
 make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,

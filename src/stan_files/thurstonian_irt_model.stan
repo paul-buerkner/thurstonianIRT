@@ -1,4 +1,25 @@
 functions {
+  /* cumulative log-PDF for a single response
+   * assumes the latent variable to be normal
+   * Args:
+   *   y: response category
+   *   mu: linear predictor
+   *   thres: ordinal thresholds
+   * Returns:
+   *   a scalar to be added to the log posterior
+   */
+   real cumulative_Phi_lpmf(int y, real mu, vector thres) {
+     int ncat = num_elements(thres) + 1;
+     real p;
+     if (y == 0) {
+       p = Phi(thres[1] - mu);
+     } else if (y == ncat - 1) {
+       p = 1 - Phi(thres[ncat - 1] - mu);
+     } else {
+       p = Phi(thres[y + 1] - mu) - Phi(thres[y] - mu);
+     }
+     return log(p);
+   }
 }
 data {
   int<lower=1> N;  // total number of observations
@@ -27,15 +48,18 @@ data {
   int<lower=0> N_item_equal;
   int<lower=1> J_item_equal[N_item_equal];
   int<lower=1> J_item_orig[N_item_equal];
-  // fix lambda
-  // vector[N_item] lambda;
+  // number of response categories determines the distribution
+  // ncat == 2: bernoulli; ncat > 2: cumulative
+  int<lower=2> ncat;
 }
 transformed data {
   vector<lower=0>[N_item_fix] psi_fix;  // fixed item SDs
   psi_fix = rep_vector(1.0, N_item_fix);
 }
 parameters {
-  vector[N_itemC] gamma;  // item thresholds
+  // item thresholds depend on model type
+  vector[ncat == 2 ? N_itemC : 0] gamma;
+  ordered[ncat - 1] gamma_ord[ncat > 2 ? N_itemC : 0];
   vector<lower=0>[N_item_pos] lambda_pos;  // item loadings
   vector<upper=0>[N_item_neg] lambda_neg;  // item loadings
   vector<lower=0>[N_item_est] psi_est;  // estimated item SDs
@@ -63,27 +87,45 @@ transformed parameters {
 }
 model {
   vector[N] mu;
+  vector[N] sum_psi;
   for (n in 1:N) {
-    // define linear predictor
-    mu[n] = - gamma[J_itemC[n]] +
+    // compute linear predictor
+    mu[n] = r[J_item1[n]] - r[J_item2[n]] +
       lambda[J_item1[n]] * eta[J_person[n], J_trait1[n]] -
-      lambda[J_item2[n]] * eta[J_person[n], J_trait2[n]] +
-      r[J_item1[n]] - r[J_item2[n]];
-    // scale with item variances
-    mu[n] = mu[n] / sqrt(psi[J_item1[n]]^2 + psi[J_item2[n]]^2);
-    // transform to probability space
-    mu[n] = Phi(mu[n]);
+      lambda[J_item2[n]] * eta[J_person[n], J_trait2[n]];
+    // scale with item standard deviations
+    sum_psi[n] = sqrt(psi[J_item1[n]]^2 + psi[J_item2[n]]^2);
+    mu[n] = mu[n] / sum_psi[n];
   }
-  // prior specifications
-  gamma ~ normal(0, 3);
+  if (ncat == 2) {
+    for (n in 1:N) {
+      // scale and add intercept
+      // use - gamma for consistency with Brown et al. 2011
+      mu[n] += - gamma[J_itemC[n]] / sum_psi[n];
+      // likelihood contribution
+      Y[n] ~ bernoulli(Phi(mu[n]));
+    }
+    // prior for thresholds
+    gamma ~ normal(0, 3);
+  } else if (ncat > 2) {
+    for (n in 1:N) {
+      // scale thresholds
+      vector[ncat - 1] thres = gamma_ord[J_itemC[n]] / sum_psi[n];
+      // likelihood contribution
+      Y[n] ~ cumulative_Phi(mu[n], thres);
+    }
+    // prior for thresholds
+    for (i in 1:N_itemC) {
+      gamma_ord[i] ~ normal(0, 3);
+    }
+  }
+  // further prior specifications
   lambda_pos ~ normal(1, 0.5);
   lambda_neg ~ normal(-1, 0.5);
   psi_est ~ normal(1, 0.3);
   L_trait ~ lkj_corr_cholesky(1);
   to_vector(z_trait) ~ normal(0, 1);
   z ~ normal(0, 1);
-  // likelihood contribution
-  Y ~ bernoulli(mu);
 }
 generated quantities {
   // Cor_trait is Phi

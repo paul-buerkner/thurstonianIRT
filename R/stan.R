@@ -1,10 +1,10 @@
 #' Prepare data for Thurstonian IRT models fitted with Stan
-#' 
+#'
 #' @inheritParams make_TIRT_data
-#' 
+#'
 #' @return A list of data ready to be passed to \pkg{Stan}.
-#' 
-#' @useDynLib thurstonianIRT, .registration = TRUE 
+#'
+#' @useDynLib thurstonianIRT, .registration = TRUE
 #' @import Rcpp
 #' @import methods
 #' @export
@@ -28,7 +28,8 @@ make_stan_data <- function(data, blocks = NULL) {
     J_trait1 = as.numeric(data$trait1),
     J_trait2 = as.numeric(data$trait2),
     J_item_pos = which(att[["signs"]] >= 0),
-    J_item_neg = which(att[["signs"]] < 0)
+    J_item_neg = which(att[["signs"]] < 0),
+    ncat = NCOL(data$gamma) + 1
   )
   nitems_per_block <- att[["nitems_per_block"]]
   nitems <- att[["nitems"]]
@@ -51,7 +52,7 @@ make_stan_data <- function(data, blocks = NULL) {
     stan_data$J_item_neg <- with(stan_data, setdiff(J_item_neg, J_item_equal))
     stan_data$J_item_fix <- with(stan_data, setdiff(J_item_fix, J_item_equal))
     stan_data$J_item_est <- with(stan_data, setdiff(J_item_est, J_item_equal))
-  } else { 
+  } else {
     stan_data$J_item_equal <-  stan_data$J_item_orig <- integer(0)
   }
   stan_data$N_item_pos = length(stan_data$J_item_pos)
@@ -64,23 +65,23 @@ make_stan_data <- function(data, blocks = NULL) {
 }
 
 #' Fit Thurstonian IRT models in Stan
-#' 
+#'
 #' @inheritParams make_TIRT_data
 #' @param init Initial values of the parameters.
 #' Defaults to \code{0} as it proved to be most stable.
-#' @param ... Further arguments passed to 
+#' @param ... Further arguments passed to
 #' \code{\link[rstan:sampling]{rstan::sampling}}.
-#' 
+#'
 #' @return A \code{TIRTfit} object.
-#' 
+#'
 #' @export
 fit_TIRT_stan <- function(data, blocks = NULL, init = 0, ...) {
   data <- make_TIRT_data(data, blocks)
   stan_data <- make_stan_data(data)
-  stan_pars = c("Cor_trait", "lambda", "psi", "gamma", "r", "eta")
+  stan_pars = c("Cor_trait", "lambda", "psi", "gamma", "gamma_ord", "r", "eta")
   fit <- rstan::sampling(
-    stanmodels$thurstonian_irt_model, 
-    data = stan_data, pars = stan_pars, 
+    stanmodels$thurstonian_irt_model,
+    data = stan_data, pars = stan_pars,
     init = init, ...
   )
   structure(nlist(fit, data), class = "TIRTfit")
