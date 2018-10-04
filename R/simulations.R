@@ -13,6 +13,8 @@
 #'   person factor scores. Only used if \code{eta} is not provided.
 #' @param eta Optional person factor scores. If provided, argument
 #'   \code{Phi} will be ignored.
+#' @param family Name of assumed the response distribution. Either
+#'   \code{"bernoulli"}, \code{"cumulative"}, or \code{"beta"}.
 #' @param nblocks_per_trait Number of blocks per trait.
 #' @param nitems_per_block Number of items per block.
 #' @param comb_blocks Indicates how to combine traits to blocks.
@@ -43,6 +45,7 @@
 #' @export
 sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
                           psi = NULL, Phi = NULL, eta = NULL,
+                          family = c("bernoulli", "cumulative", "beta"),
                           nblocks_per_trait = 5, nitems_per_block = 3,
                           comb_blocks = c("random", "fixed")) {
   # prepare data in long format to which responses may be added
@@ -50,6 +53,7 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
     stop("The number of items per block must divide ",
          "the number of total items.")
   }
+  family <- match.arg(family)
   comb_blocks <- match.arg(comb_blocks)
   nblocks <- ntraits * nblocks_per_trait / nitems_per_block
   nitems <- nitems_per_block * nblocks
@@ -125,10 +129,12 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
     stop("eta should be of dimension (", dim_eta_exp[1],
          ", ", dim_eta_exp[2], ").")
   }
-  if (NCOL(gamma) > 1L) {
+  if (family == "cumulative") {
+    stopifnot(NCOL(gamma) > 1L)
     data$gamma <- gamma[data$comparison, , drop = FALSE]
   } else {
-    data$gamma <- gamma[data$comparison]
+    stopifnot(NCOL(gamma) == 1L)
+    data$gamma <- as.vector(gamma)[data$comparison]
   }
   if (is.list(lambda)) {
     if (length(lambda) != ntraits) {
@@ -156,13 +162,14 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
   }
 
   data$prob <- prob_response(data)
-  data$response <- sim_response(data$prob)
+  data$response <- sim_response(data$prob, family = family)
   structure(data,
     npersons = npersons, ntraits = ntraits, nblocks = nblocks,
     nitems = nitems, nblocks_per_trait = nblocks_per_trait,
     nitems_per_block = nitems_per_block,
     signs = sign(lambda), lambda = lambda, psi = psi, eta = eta,
     traits = paste0("trait", seq_len(ntraits)),
+    family = family,
     class = c("TIRTdata", class(data))
   )
 }
@@ -172,13 +179,24 @@ sim_eta <- function(npersons, Phi) {
   mnormt::rmnorm(npersons, mu, Phi)
 }
 
-sim_response <- function(prob) {
+sim_response <- function(prob, family = "bernoulli", disp = 20) {
   # Args:
   #   prob: vector or matrix of category probabilities
+  #   disp: dispersion parameter for beta models
   stopifnot(NCOL(prob) > 0L)
   if (NCOL(prob) == 1L) {
-    out <- stats::rbinom(length(prob), size = 1, prob = prob)
+    stopifnot(family %in% c("bernoulli", "beta"))
+    if (family == "bernoulli") {
+      out <- stats::rbinom(length(prob), size = 1, prob = prob)
+    } else {
+      # mean parameterization of the beta distribution
+      out <- stats::rbeta(length(prob), prob * disp, (1 - prob) * disp)
+      # truncate distribution at the extremes
+      out[out < 0.001] <- 0.001
+      out[out > 0.999] <- 0.999
+    }
   } else {
+    stopifnot(family %in% "cumulative")
     cats <- seq_len(NCOL(prob)) - 1
     out <- apply(prob, 1, function(p) sample(cats, 1, prob = p))
   }

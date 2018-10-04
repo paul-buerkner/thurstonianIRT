@@ -5,7 +5,8 @@
 \title{Simulate Thurstonian IRT data}
 \usage{
 sim_TIRT_data(npersons, ntraits, lambda, gamma, psi = NULL, Phi = NULL,
-  eta = NULL, nblocks_per_trait = 5, nitems_per_block = 3,
+  eta = NULL, family = c("bernoulli", "cumulative", "beta"),
+  nblocks_per_trait = 5, nitems_per_block = 3,
   comb_blocks = c("random", "fixed"))
 }
 \arguments{
@@ -28,6 +29,9 @@ person factor scores. Only used if \code{eta} is not provided.}
 
 \item{eta}{Optional person factor scores. If provided, argument
 \code{Phi} will be ignored.}
+
+\item{family}{Name of assumed the response distribution. Either
+\code{"bernoulli"}, \code{"cumulative"}, or \code{"beta"}.}
 
 \item{nblocks_per_trait}{Number of blocks per trait.}
 

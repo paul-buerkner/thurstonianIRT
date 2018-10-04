@@ -14,8 +14,7 @@ make_stan_data <- function(data, blocks = NULL) {
   }
   data <- convert_factors(data)
   att <- attributes(data)
-  stan_data = list(
-    Y = data$response,
+  out = list(
     N = nrow(data),
     N_item = length(unique(c(data$item1, data$item2))),
     N_itemC = length(unique(data$itemC)),
@@ -31,10 +30,23 @@ make_stan_data <- function(data, blocks = NULL) {
     J_item_neg = which(att[["signs"]] < 0),
     ncat = NCOL(data$gamma) + 1
   )
+
+  # prepare family and response values
+  family <- att$family
+  options <- c("bernoulli", "cumulative", "beta")
+  out$family <- as.numeric(factor(family, options))
+  if (family %in% c("bernoulli", "cumulative")) {
+    out$Yint <- data$response
+    out$Yreal <- numeric(0)
+  } else if (family %in% "beta") {
+    out$Yint <- integer(0)
+    out$Yreal <- data$response
+  }
+
   nitems_per_block <- att[["nitems_per_block"]]
   nitems <- att[["nitems"]]
-  stan_data$J_item_fix <- seq(1, nitems, nitems_per_block)
-  stan_data$J_item_est <- setdiff(1:nitems, stan_data$J_item_fix)
+  out$J_item_fix <- seq(1, nitems, nitems_per_block)
+  out$J_item_est <- setdiff(1:nitems, out$J_item_fix)
   if (length(att$dupl_items)) {
     # force item parameters of the same item to be equal
     # this happens if the same items is applied in multiple blocks
@@ -45,23 +57,23 @@ make_stan_data <- function(data, blocks = NULL) {
       J_item_equal[[i]] <- dup
       J_item_orig[[i]] <- rep(first, length(dup))
     }
-    stan_data$J_item_equal <- unlist(J_item_equal)
-    stan_data$J_item_orig <- unlist(J_item_orig)
+    out$J_item_equal <- unlist(J_item_equal)
+    out$J_item_orig <- unlist(J_item_orig)
     # duplicated items should not be part of the other index variables
-    stan_data$J_item_pos <- with(stan_data, setdiff(J_item_pos, J_item_equal))
-    stan_data$J_item_neg <- with(stan_data, setdiff(J_item_neg, J_item_equal))
-    stan_data$J_item_fix <- with(stan_data, setdiff(J_item_fix, J_item_equal))
-    stan_data$J_item_est <- with(stan_data, setdiff(J_item_est, J_item_equal))
+    out$J_item_pos <- with(out, setdiff(J_item_pos, J_item_equal))
+    out$J_item_neg <- with(out, setdiff(J_item_neg, J_item_equal))
+    out$J_item_fix <- with(out, setdiff(J_item_fix, J_item_equal))
+    out$J_item_est <- with(out, setdiff(J_item_est, J_item_equal))
   } else {
-    stan_data$J_item_equal <-  stan_data$J_item_orig <- integer(0)
+    out$J_item_equal <-  out$J_item_orig <- integer(0)
   }
-  stan_data$N_item_pos = length(stan_data$J_item_pos)
-  stan_data$N_item_neg = length(stan_data$J_item_neg)
-  stan_data$N_item_fix = length(stan_data$J_item_fix)
-  stan_data$N_item_est = length(stan_data$J_item_est)
-  stan_data$N_item_equal <- length(stan_data$J_item_equal)
-  stan_data$N_item_orig <- length(stan_data$J_item_orig)
-  stan_data
+  out$N_item_pos = length(out$J_item_pos)
+  out$N_item_neg = length(out$J_item_neg)
+  out$N_item_fix = length(out$J_item_fix)
+  out$N_item_est = length(out$J_item_est)
+  out$N_item_equal <- length(out$J_item_equal)
+  out$N_item_orig <- length(out$J_item_orig)
+  out
 }
 
 #' Fit Thurstonian IRT models in Stan
@@ -78,7 +90,10 @@ make_stan_data <- function(data, blocks = NULL) {
 fit_TIRT_stan <- function(data, blocks = NULL, init = 0, ...) {
   data <- make_TIRT_data(data, blocks)
   stan_data <- make_stan_data(data)
-  stan_pars = c("Cor_trait", "lambda", "psi", "gamma", "gamma_ord", "r", "eta")
+  stan_pars = c(
+    "Cor_trait", "lambda", "psi", "gamma",
+    "gamma_ord", "disp", "r", "eta"
+  )
   fit <- rstan::sampling(
     stanmodels$thurstonian_irt_model,
     data = stan_data, pars = stan_pars,

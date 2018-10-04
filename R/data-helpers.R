@@ -79,6 +79,8 @@ make_TIRT_data <- function(data, blocks) {
     nitems = nitems, nitems_per_block = nitems_per_block,
     signs = ulapply(blocks, "[[", "signs"), dupl_items = dupl_items,
     traits = unique(ulapply(blocks, "[[", "traits")),
+    # TODO: allow for other families
+    family = "bernoulli",
     class = c("TIRTdata", class(out))
   )
 }

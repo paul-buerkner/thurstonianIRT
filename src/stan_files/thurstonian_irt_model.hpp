@@ -40,7 +40,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_thurstonian_irt_model");
-    reader.add_event(134, 134, "end", "model_thurstonian_irt_model");
+    reader.add_event(148, 148, "end", "model_thurstonian_irt_model");
     return reader;
 }
 
@@ -118,8 +118,10 @@ struct cumulative_Phi_lpmf_functor__ {
 #include <meta_header.hpp>
  class model_thurstonian_irt_model : public prob_grad {
 private:
+    int family;
     int N;
-    vector<int> Y;
+    vector<int> Yint;
+    vector<double> Yreal;
     int N_item;
     int N_itemC;
     int N_person;
@@ -177,60 +179,77 @@ public:
 
         // initialize member variables
         try {
-            current_statement_begin__ = 25;
+            current_statement_begin__ = 26;
+            context__.validate_dims("data initialization", "family", "int", context__.to_vec());
+            family = int(0);
+            vals_i__ = context__.vals_i("family");
+            pos__ = 0;
+            family = vals_i__[pos__++];
+            current_statement_begin__ = 30;
             context__.validate_dims("data initialization", "N", "int", context__.to_vec());
             N = int(0);
             vals_i__ = context__.vals_i("N");
             pos__ = 0;
             N = vals_i__[pos__++];
-            current_statement_begin__ = 26;
-            validate_non_negative_index("Y", "N", N);
-            context__.validate_dims("data initialization", "Y", "int", context__.to_vec(N));
-            validate_non_negative_index("Y", "N", N);
-            Y = std::vector<int>(N,int(0));
-            vals_i__ = context__.vals_i("Y");
+            current_statement_begin__ = 32;
+            validate_non_negative_index("Yint", "((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,2))) ? N : 0 )", ((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,2))) ? N : 0 ));
+            context__.validate_dims("data initialization", "Yint", "int", context__.to_vec(((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,2))) ? N : 0 )));
+            validate_non_negative_index("Yint", "((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,2))) ? N : 0 )", ((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,2))) ? N : 0 ));
+            Yint = std::vector<int>(((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,2))) ? N : 0 ),int(0));
+            vals_i__ = context__.vals_i("Yint");
             pos__ = 0;
-            size_t Y_limit_0__ = N;
-            for (size_t i_0__ = 0; i_0__ < Y_limit_0__; ++i_0__) {
-                Y[i_0__] = vals_i__[pos__++];
+            size_t Yint_limit_0__ = ((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,2))) ? N : 0 );
+            for (size_t i_0__ = 0; i_0__ < Yint_limit_0__; ++i_0__) {
+                Yint[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 27;
+            current_statement_begin__ = 33;
+            validate_non_negative_index("Yreal", "(logical_eq(family,3) ? N : 0 )", (logical_eq(family,3) ? N : 0 ));
+            context__.validate_dims("data initialization", "Yreal", "double", context__.to_vec((logical_eq(family,3) ? N : 0 )));
+            validate_non_negative_index("Yreal", "(logical_eq(family,3) ? N : 0 )", (logical_eq(family,3) ? N : 0 ));
+            Yreal = std::vector<double>((logical_eq(family,3) ? N : 0 ),double(0));
+            vals_r__ = context__.vals_r("Yreal");
+            pos__ = 0;
+            size_t Yreal_limit_0__ = (logical_eq(family,3) ? N : 0 );
+            for (size_t i_0__ = 0; i_0__ < Yreal_limit_0__; ++i_0__) {
+                Yreal[i_0__] = vals_r__[pos__++];
+            }
+            current_statement_begin__ = 34;
             context__.validate_dims("data initialization", "N_item", "int", context__.to_vec());
             N_item = int(0);
             vals_i__ = context__.vals_i("N_item");
             pos__ = 0;
             N_item = vals_i__[pos__++];
-            current_statement_begin__ = 28;
+            current_statement_begin__ = 35;
             context__.validate_dims("data initialization", "N_itemC", "int", context__.to_vec());
             N_itemC = int(0);
             vals_i__ = context__.vals_i("N_itemC");
             pos__ = 0;
             N_itemC = vals_i__[pos__++];
-            current_statement_begin__ = 29;
+            current_statement_begin__ = 36;
             context__.validate_dims("data initialization", "N_person", "int", context__.to_vec());
             N_person = int(0);
             vals_i__ = context__.vals_i("N_person");
             pos__ = 0;
             N_person = vals_i__[pos__++];
-            current_statement_begin__ = 30;
+            current_statement_begin__ = 37;
             context__.validate_dims("data initialization", "N_trait", "int", context__.to_vec());
             N_trait = int(0);
             vals_i__ = context__.vals_i("N_trait");
             pos__ = 0;
             N_trait = vals_i__[pos__++];
-            current_statement_begin__ = 31;
+            current_statement_begin__ = 38;
             context__.validate_dims("data initialization", "N_item_fix", "int", context__.to_vec());
             N_item_fix = int(0);
             vals_i__ = context__.vals_i("N_item_fix");
             pos__ = 0;
             N_item_fix = vals_i__[pos__++];
-            current_statement_begin__ = 32;
+            current_statement_begin__ = 39;
             context__.validate_dims("data initialization", "N_item_est", "int", context__.to_vec());
             N_item_est = int(0);
             vals_i__ = context__.vals_i("N_item_est");
             pos__ = 0;
             N_item_est = vals_i__[pos__++];
-            current_statement_begin__ = 34;
+            current_statement_begin__ = 41;
             validate_non_negative_index("J_item1", "N", N);
             context__.validate_dims("data initialization", "J_item1", "int", context__.to_vec(N));
             validate_non_negative_index("J_item1", "N", N);
@@ -241,7 +260,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_item1_limit_0__; ++i_0__) {
                 J_item1[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 35;
+            current_statement_begin__ = 42;
             validate_non_negative_index("J_item2", "N", N);
             context__.validate_dims("data initialization", "J_item2", "int", context__.to_vec(N));
             validate_non_negative_index("J_item2", "N", N);
@@ -252,7 +271,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_item2_limit_0__; ++i_0__) {
                 J_item2[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 36;
+            current_statement_begin__ = 43;
             validate_non_negative_index("J_itemC", "N", N);
             context__.validate_dims("data initialization", "J_itemC", "int", context__.to_vec(N));
             validate_non_negative_index("J_itemC", "N", N);
@@ -263,7 +282,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_itemC_limit_0__; ++i_0__) {
                 J_itemC[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 37;
+            current_statement_begin__ = 44;
             validate_non_negative_index("J_person", "N", N);
             context__.validate_dims("data initialization", "J_person", "int", context__.to_vec(N));
             validate_non_negative_index("J_person", "N", N);
@@ -274,7 +293,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_person_limit_0__; ++i_0__) {
                 J_person[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 38;
+            current_statement_begin__ = 45;
             validate_non_negative_index("J_trait1", "N", N);
             context__.validate_dims("data initialization", "J_trait1", "int", context__.to_vec(N));
             validate_non_negative_index("J_trait1", "N", N);
@@ -285,7 +304,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_trait1_limit_0__; ++i_0__) {
                 J_trait1[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 39;
+            current_statement_begin__ = 46;
             validate_non_negative_index("J_trait2", "N", N);
             context__.validate_dims("data initialization", "J_trait2", "int", context__.to_vec(N));
             validate_non_negative_index("J_trait2", "N", N);
@@ -296,7 +315,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_trait2_limit_0__; ++i_0__) {
                 J_trait2[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 40;
+            current_statement_begin__ = 47;
             validate_non_negative_index("J_item_fix", "N_item_fix", N_item_fix);
             context__.validate_dims("data initialization", "J_item_fix", "int", context__.to_vec(N_item_fix));
             validate_non_negative_index("J_item_fix", "N_item_fix", N_item_fix);
@@ -307,7 +326,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_item_fix_limit_0__; ++i_0__) {
                 J_item_fix[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 41;
+            current_statement_begin__ = 48;
             validate_non_negative_index("J_item_est", "N_item_est", N_item_est);
             context__.validate_dims("data initialization", "J_item_est", "int", context__.to_vec(N_item_est));
             validate_non_negative_index("J_item_est", "N_item_est", N_item_est);
@@ -318,19 +337,19 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_item_est_limit_0__; ++i_0__) {
                 J_item_est[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 43;
+            current_statement_begin__ = 50;
             context__.validate_dims("data initialization", "N_item_pos", "int", context__.to_vec());
             N_item_pos = int(0);
             vals_i__ = context__.vals_i("N_item_pos");
             pos__ = 0;
             N_item_pos = vals_i__[pos__++];
-            current_statement_begin__ = 44;
+            current_statement_begin__ = 51;
             context__.validate_dims("data initialization", "N_item_neg", "int", context__.to_vec());
             N_item_neg = int(0);
             vals_i__ = context__.vals_i("N_item_neg");
             pos__ = 0;
             N_item_neg = vals_i__[pos__++];
-            current_statement_begin__ = 45;
+            current_statement_begin__ = 52;
             validate_non_negative_index("J_item_pos", "N_item_pos", N_item_pos);
             context__.validate_dims("data initialization", "J_item_pos", "int", context__.to_vec(N_item_pos));
             validate_non_negative_index("J_item_pos", "N_item_pos", N_item_pos);
@@ -341,7 +360,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_item_pos_limit_0__; ++i_0__) {
                 J_item_pos[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 46;
+            current_statement_begin__ = 53;
             validate_non_negative_index("J_item_neg", "N_item_neg", N_item_neg);
             context__.validate_dims("data initialization", "J_item_neg", "int", context__.to_vec(N_item_neg));
             validate_non_negative_index("J_item_neg", "N_item_neg", N_item_neg);
@@ -352,13 +371,13 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_item_neg_limit_0__; ++i_0__) {
                 J_item_neg[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 48;
+            current_statement_begin__ = 55;
             context__.validate_dims("data initialization", "N_item_equal", "int", context__.to_vec());
             N_item_equal = int(0);
             vals_i__ = context__.vals_i("N_item_equal");
             pos__ = 0;
             N_item_equal = vals_i__[pos__++];
-            current_statement_begin__ = 49;
+            current_statement_begin__ = 56;
             validate_non_negative_index("J_item_equal", "N_item_equal", N_item_equal);
             context__.validate_dims("data initialization", "J_item_equal", "int", context__.to_vec(N_item_equal));
             validate_non_negative_index("J_item_equal", "N_item_equal", N_item_equal);
@@ -369,7 +388,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_item_equal_limit_0__; ++i_0__) {
                 J_item_equal[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 50;
+            current_statement_begin__ = 57;
             validate_non_negative_index("J_item_orig", "N_item_equal", N_item_equal);
             context__.validate_dims("data initialization", "J_item_orig", "int", context__.to_vec(N_item_equal));
             validate_non_negative_index("J_item_orig", "N_item_equal", N_item_equal);
@@ -380,7 +399,7 @@ public:
             for (size_t i_0__ = 0; i_0__ < J_item_orig_limit_0__; ++i_0__) {
                 J_item_orig[i_0__] = vals_i__[pos__++];
             }
-            current_statement_begin__ = 53;
+            current_statement_begin__ = 60;
             context__.validate_dims("data initialization", "ncat", "int", context__.to_vec());
             ncat = int(0);
             vals_i__ = context__.vals_i("ncat");
@@ -388,119 +407,126 @@ public:
             ncat = vals_i__[pos__++];
 
             // validate, data variables
-            current_statement_begin__ = 25;
-            check_greater_or_equal(function__,"N",N,1);
             current_statement_begin__ = 26;
-            current_statement_begin__ = 27;
-            check_greater_or_equal(function__,"N_item",N_item,1);
-            current_statement_begin__ = 28;
-            check_greater_or_equal(function__,"N_itemC",N_itemC,1);
-            current_statement_begin__ = 29;
-            check_greater_or_equal(function__,"N_person",N_person,1);
+            check_greater_or_equal(function__,"family",family,1);
+            check_less_or_equal(function__,"family",family,3);
             current_statement_begin__ = 30;
-            check_greater_or_equal(function__,"N_trait",N_trait,1);
-            current_statement_begin__ = 31;
-            check_greater_or_equal(function__,"N_item_fix",N_item_fix,0);
+            check_greater_or_equal(function__,"N",N,1);
             current_statement_begin__ = 32;
-            check_greater_or_equal(function__,"N_item_est",N_item_est,0);
+            current_statement_begin__ = 33;
             current_statement_begin__ = 34;
+            check_greater_or_equal(function__,"N_item",N_item,1);
+            current_statement_begin__ = 35;
+            check_greater_or_equal(function__,"N_itemC",N_itemC,1);
+            current_statement_begin__ = 36;
+            check_greater_or_equal(function__,"N_person",N_person,1);
+            current_statement_begin__ = 37;
+            check_greater_or_equal(function__,"N_trait",N_trait,1);
+            current_statement_begin__ = 38;
+            check_greater_or_equal(function__,"N_item_fix",N_item_fix,0);
+            current_statement_begin__ = 39;
+            check_greater_or_equal(function__,"N_item_est",N_item_est,0);
+            current_statement_begin__ = 41;
             for (int k0__ = 0; k0__ < N; ++k0__) {
                 check_greater_or_equal(function__,"J_item1[k0__]",J_item1[k0__],1);
             }
-            current_statement_begin__ = 35;
+            current_statement_begin__ = 42;
             for (int k0__ = 0; k0__ < N; ++k0__) {
                 check_greater_or_equal(function__,"J_item2[k0__]",J_item2[k0__],1);
             }
-            current_statement_begin__ = 36;
+            current_statement_begin__ = 43;
             for (int k0__ = 0; k0__ < N; ++k0__) {
                 check_greater_or_equal(function__,"J_itemC[k0__]",J_itemC[k0__],1);
             }
-            current_statement_begin__ = 37;
+            current_statement_begin__ = 44;
             for (int k0__ = 0; k0__ < N; ++k0__) {
                 check_greater_or_equal(function__,"J_person[k0__]",J_person[k0__],1);
             }
-            current_statement_begin__ = 38;
+            current_statement_begin__ = 45;
             for (int k0__ = 0; k0__ < N; ++k0__) {
                 check_greater_or_equal(function__,"J_trait1[k0__]",J_trait1[k0__],1);
             }
-            current_statement_begin__ = 39;
+            current_statement_begin__ = 46;
             for (int k0__ = 0; k0__ < N; ++k0__) {
                 check_greater_or_equal(function__,"J_trait2[k0__]",J_trait2[k0__],1);
             }
-            current_statement_begin__ = 40;
+            current_statement_begin__ = 47;
             for (int k0__ = 0; k0__ < N_item_fix; ++k0__) {
                 check_greater_or_equal(function__,"J_item_fix[k0__]",J_item_fix[k0__],1);
             }
-            current_statement_begin__ = 41;
+            current_statement_begin__ = 48;
             for (int k0__ = 0; k0__ < N_item_est; ++k0__) {
                 check_greater_or_equal(function__,"J_item_est[k0__]",J_item_est[k0__],1);
             }
-            current_statement_begin__ = 43;
+            current_statement_begin__ = 50;
             check_greater_or_equal(function__,"N_item_pos",N_item_pos,0);
-            current_statement_begin__ = 44;
+            current_statement_begin__ = 51;
             check_greater_or_equal(function__,"N_item_neg",N_item_neg,0);
-            current_statement_begin__ = 45;
+            current_statement_begin__ = 52;
             for (int k0__ = 0; k0__ < N_item_pos; ++k0__) {
                 check_greater_or_equal(function__,"J_item_pos[k0__]",J_item_pos[k0__],1);
             }
-            current_statement_begin__ = 46;
+            current_statement_begin__ = 53;
             for (int k0__ = 0; k0__ < N_item_neg; ++k0__) {
                 check_greater_or_equal(function__,"J_item_neg[k0__]",J_item_neg[k0__],1);
             }
-            current_statement_begin__ = 48;
+            current_statement_begin__ = 55;
             check_greater_or_equal(function__,"N_item_equal",N_item_equal,0);
-            current_statement_begin__ = 49;
+            current_statement_begin__ = 56;
             for (int k0__ = 0; k0__ < N_item_equal; ++k0__) {
                 check_greater_or_equal(function__,"J_item_equal[k0__]",J_item_equal[k0__],1);
             }
-            current_statement_begin__ = 50;
+            current_statement_begin__ = 57;
             for (int k0__ = 0; k0__ < N_item_equal; ++k0__) {
                 check_greater_or_equal(function__,"J_item_orig[k0__]",J_item_orig[k0__],1);
             }
-            current_statement_begin__ = 53;
+            current_statement_begin__ = 60;
             check_greater_or_equal(function__,"ncat",ncat,2);
             // initialize data variables
-            current_statement_begin__ = 56;
+            current_statement_begin__ = 63;
             validate_non_negative_index("psi_fix", "N_item_fix", N_item_fix);
             psi_fix = vector_d(static_cast<Eigen::VectorXd::Index>(N_item_fix));
             stan::math::fill(psi_fix,DUMMY_VAR__);
 
-            current_statement_begin__ = 57;
+            current_statement_begin__ = 64;
             stan::math::assign(psi_fix, rep_vector(1.0,N_item_fix));
 
             // validate transformed data
-            current_statement_begin__ = 56;
+            current_statement_begin__ = 63;
             check_greater_or_equal(function__,"psi_fix",psi_fix,0);
 
             // validate, set parameter ranges
             num_params_r__ = 0U;
             param_ranges_i__.clear();
-            current_statement_begin__ = 61;
-            validate_non_negative_index("gamma", "(logical_eq(ncat,2) ? N_itemC : 0 )", (logical_eq(ncat,2) ? N_itemC : 0 ));
-            num_params_r__ += (logical_eq(ncat,2) ? N_itemC : 0 );
-            current_statement_begin__ = 62;
+            current_statement_begin__ = 68;
+            validate_non_negative_index("gamma", "((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 )", ((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 ));
+            num_params_r__ += ((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 );
+            current_statement_begin__ = 69;
             validate_non_negative_index("gamma_ord", "(ncat - 1)", (ncat - 1));
-            validate_non_negative_index("gamma_ord", "(logical_gt(ncat,2) ? N_itemC : 0 )", (logical_gt(ncat,2) ? N_itemC : 0 ));
-            num_params_r__ += (ncat - 1) * (logical_gt(ncat,2) ? N_itemC : 0 );
-            current_statement_begin__ = 63;
+            validate_non_negative_index("gamma_ord", "(logical_eq(family,2) ? N_itemC : 0 )", (logical_eq(family,2) ? N_itemC : 0 ));
+            num_params_r__ += (ncat - 1) * (logical_eq(family,2) ? N_itemC : 0 );
+            current_statement_begin__ = 70;
             validate_non_negative_index("lambda_pos", "N_item_pos", N_item_pos);
             num_params_r__ += N_item_pos;
-            current_statement_begin__ = 64;
+            current_statement_begin__ = 71;
             validate_non_negative_index("lambda_neg", "N_item_neg", N_item_neg);
             num_params_r__ += N_item_neg;
-            current_statement_begin__ = 65;
+            current_statement_begin__ = 72;
             validate_non_negative_index("psi_est", "N_item_est", N_item_est);
             num_params_r__ += N_item_est;
-            current_statement_begin__ = 67;
+            current_statement_begin__ = 74;
         validate_non_negative_index("z_trait", "N_trait", N_trait);
             validate_non_negative_index("z_trait", "N_person", N_person);
             num_params_r__ += N_trait * N_person;
-            current_statement_begin__ = 69;
+            current_statement_begin__ = 76;
             validate_non_negative_index("L_trait", "N_trait", N_trait);
             num_params_r__ += ((N_trait * (N_trait - 1)) / 2);
-            current_statement_begin__ = 70;
+            current_statement_begin__ = 77;
             validate_non_negative_index("z", "N_item", N_item);
             num_params_r__ += N_item;
+            current_statement_begin__ = 79;
+            validate_non_negative_index("disp", "(logical_eq(family,3) ? 1 : 0 )", (logical_eq(family,3) ? 1 : 0 ));
+            num_params_r__ += (logical_eq(family,3) ? 1 : 0 );
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
             // Next line prevents compiler griping about no return
@@ -525,10 +551,10 @@ public:
             throw std::runtime_error("variable gamma missing");
         vals_r__ = context__.vals_r("gamma");
         pos__ = 0U;
-        validate_non_negative_index("gamma", "(logical_eq(ncat,2) ? N_itemC : 0 )", (logical_eq(ncat,2) ? N_itemC : 0 ));
-        context__.validate_dims("initialization", "gamma", "vector_d", context__.to_vec((logical_eq(ncat,2) ? N_itemC : 0 )));
-        vector_d gamma(static_cast<Eigen::VectorXd::Index>((logical_eq(ncat,2) ? N_itemC : 0 )));
-        for (int j1__ = 0U; j1__ < (logical_eq(ncat,2) ? N_itemC : 0 ); ++j1__)
+        validate_non_negative_index("gamma", "((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 )", ((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 ));
+        context__.validate_dims("initialization", "gamma", "vector_d", context__.to_vec(((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 )));
+        vector_d gamma(static_cast<Eigen::VectorXd::Index>(((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 )));
+        for (int j1__ = 0U; j1__ < ((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 ); ++j1__)
             gamma(j1__) = vals_r__[pos__++];
         try {
             writer__.vector_unconstrain(gamma);
@@ -540,14 +566,14 @@ public:
             throw std::runtime_error("variable gamma_ord missing");
         vals_r__ = context__.vals_r("gamma_ord");
         pos__ = 0U;
-        validate_non_negative_index("gamma_ord", "(logical_gt(ncat,2) ? N_itemC : 0 )", (logical_gt(ncat,2) ? N_itemC : 0 ));
+        validate_non_negative_index("gamma_ord", "(logical_eq(family,2) ? N_itemC : 0 )", (logical_eq(family,2) ? N_itemC : 0 ));
         validate_non_negative_index("gamma_ord", "(ncat - 1)", (ncat - 1));
-        context__.validate_dims("initialization", "gamma_ord", "vector_d", context__.to_vec((logical_gt(ncat,2) ? N_itemC : 0 ),(ncat - 1)));
-        std::vector<vector_d> gamma_ord((logical_gt(ncat,2) ? N_itemC : 0 ),vector_d(static_cast<Eigen::VectorXd::Index>((ncat - 1))));
+        context__.validate_dims("initialization", "gamma_ord", "vector_d", context__.to_vec((logical_eq(family,2) ? N_itemC : 0 ),(ncat - 1)));
+        std::vector<vector_d> gamma_ord((logical_eq(family,2) ? N_itemC : 0 ),vector_d(static_cast<Eigen::VectorXd::Index>((ncat - 1))));
         for (int j1__ = 0U; j1__ < (ncat - 1); ++j1__)
-            for (int i0__ = 0U; i0__ < (logical_gt(ncat,2) ? N_itemC : 0 ); ++i0__)
+            for (int i0__ = 0U; i0__ < (logical_eq(family,2) ? N_itemC : 0 ); ++i0__)
                 gamma_ord[i0__](j1__) = vals_r__[pos__++];
-        for (int i0__ = 0U; i0__ < (logical_gt(ncat,2) ? N_itemC : 0 ); ++i0__)
+        for (int i0__ = 0U; i0__ < (logical_eq(family,2) ? N_itemC : 0 ); ++i0__)
             try {
             writer__.ordered_unconstrain(gamma_ord[i0__]);
         } catch (const std::exception& e) { 
@@ -648,6 +674,21 @@ public:
             throw std::runtime_error(std::string("Error transforming variable z: ") + e.what());
         }
 
+        if (!(context__.contains_r("disp")))
+            throw std::runtime_error("variable disp missing");
+        vals_r__ = context__.vals_r("disp");
+        pos__ = 0U;
+        validate_non_negative_index("disp", "(logical_eq(family,3) ? 1 : 0 )", (logical_eq(family,3) ? 1 : 0 ));
+        context__.validate_dims("initialization", "disp", "vector_d", context__.to_vec((logical_eq(family,3) ? 1 : 0 )));
+        vector_d disp(static_cast<Eigen::VectorXd::Index>((logical_eq(family,3) ? 1 : 0 )));
+        for (int j1__ = 0U; j1__ < (logical_eq(family,3) ? 1 : 0 ); ++j1__)
+            disp(j1__) = vals_r__[pos__++];
+        try {
+            writer__.vector_lb_unconstrain(0,disp);
+        } catch (const std::exception& e) { 
+            throw std::runtime_error(std::string("Error transforming variable disp: ") + e.what());
+        }
+
         params_r__ = writer__.data_r();
         params_i__ = writer__.data_i();
     }
@@ -682,12 +723,12 @@ public:
             Eigen::Matrix<T__,Eigen::Dynamic,1>  gamma;
             (void) gamma;  // dummy to suppress unused var warning
             if (jacobian__)
-                gamma = in__.vector_constrain((logical_eq(ncat,2) ? N_itemC : 0 ),lp__);
+                gamma = in__.vector_constrain(((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 ),lp__);
             else
-                gamma = in__.vector_constrain((logical_eq(ncat,2) ? N_itemC : 0 ));
+                gamma = in__.vector_constrain(((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 ));
 
             vector<Eigen::Matrix<T__,Eigen::Dynamic,1> > gamma_ord;
-            size_t dim_gamma_ord_0__ = (logical_gt(ncat,2) ? N_itemC : 0 );
+            size_t dim_gamma_ord_0__ = (logical_eq(family,2) ? N_itemC : 0 );
             gamma_ord.reserve(dim_gamma_ord_0__);
             for (size_t k_0__ = 0; k_0__ < dim_gamma_ord_0__; ++k_0__) {
                 if (jacobian__)
@@ -738,9 +779,16 @@ public:
             else
                 z = in__.vector_constrain(N_item);
 
+            Eigen::Matrix<T__,Eigen::Dynamic,1>  disp;
+            (void) disp;  // dummy to suppress unused var warning
+            if (jacobian__)
+                disp = in__.vector_lb_constrain(0,(logical_eq(family,3) ? 1 : 0 ),lp__);
+            else
+                disp = in__.vector_lb_constrain(0,(logical_eq(family,3) ? 1 : 0 ));
+
 
             // transformed parameters
-            current_statement_begin__ = 74;
+            current_statement_begin__ = 83;
             validate_non_negative_index("eta", "N_person", N_person);
             validate_non_negative_index("eta", "N_trait", N_trait);
             Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic>  eta(static_cast<Eigen::VectorXd::Index>(N_person),static_cast<Eigen::VectorXd::Index>(N_trait));
@@ -748,21 +796,21 @@ public:
 
             stan::math::initialize(eta, DUMMY_VAR__);
             stan::math::fill(eta,DUMMY_VAR__);
-            current_statement_begin__ = 75;
+            current_statement_begin__ = 84;
             validate_non_negative_index("lambda", "N_item", N_item);
             Eigen::Matrix<T__,Eigen::Dynamic,1>  lambda(static_cast<Eigen::VectorXd::Index>(N_item));
             (void) lambda;  // dummy to suppress unused var warning
 
             stan::math::initialize(lambda, DUMMY_VAR__);
             stan::math::fill(lambda,DUMMY_VAR__);
-            current_statement_begin__ = 76;
+            current_statement_begin__ = 85;
             validate_non_negative_index("psi", "N_item", N_item);
             Eigen::Matrix<T__,Eigen::Dynamic,1>  psi(static_cast<Eigen::VectorXd::Index>(N_item));
             (void) psi;  // dummy to suppress unused var warning
 
             stan::math::initialize(psi, DUMMY_VAR__);
             stan::math::fill(psi,DUMMY_VAR__);
-            current_statement_begin__ = 77;
+            current_statement_begin__ = 86;
             validate_non_negative_index("r", "N_item", N_item);
             Eigen::Matrix<T__,Eigen::Dynamic,1>  r(static_cast<Eigen::VectorXd::Index>(N_item));
             (void) r;  // dummy to suppress unused var warning
@@ -771,39 +819,39 @@ public:
             stan::math::fill(r,DUMMY_VAR__);
 
 
-            current_statement_begin__ = 78;
+            current_statement_begin__ = 87;
             stan::math::assign(eta, transpose(multiply(L_trait,z_trait)));
-            current_statement_begin__ = 79;
+            current_statement_begin__ = 88;
             stan::model::assign(psi, 
                         stan::model::cons_list(stan::model::index_multi(J_item_fix), stan::model::nil_index_list()), 
                         psi_fix, 
                         "assigning variable psi");
-            current_statement_begin__ = 80;
+            current_statement_begin__ = 89;
             stan::model::assign(psi, 
                         stan::model::cons_list(stan::model::index_multi(J_item_est), stan::model::nil_index_list()), 
                         psi_est, 
                         "assigning variable psi");
-            current_statement_begin__ = 81;
+            current_statement_begin__ = 90;
             stan::model::assign(psi, 
                         stan::model::cons_list(stan::model::index_multi(J_item_equal), stan::model::nil_index_list()), 
                         stan::model::deep_copy(stan::model::rvalue(psi, stan::model::cons_list(stan::model::index_multi(J_item_orig), stan::model::nil_index_list()), "psi")), 
                         "assigning variable psi");
-            current_statement_begin__ = 82;
+            current_statement_begin__ = 91;
             stan::model::assign(lambda, 
                         stan::model::cons_list(stan::model::index_multi(J_item_pos), stan::model::nil_index_list()), 
                         lambda_pos, 
                         "assigning variable lambda");
-            current_statement_begin__ = 83;
+            current_statement_begin__ = 92;
             stan::model::assign(lambda, 
                         stan::model::cons_list(stan::model::index_multi(J_item_neg), stan::model::nil_index_list()), 
                         lambda_neg, 
                         "assigning variable lambda");
-            current_statement_begin__ = 84;
+            current_statement_begin__ = 93;
             stan::model::assign(lambda, 
                         stan::model::cons_list(stan::model::index_multi(J_item_equal), stan::model::nil_index_list()), 
                         stan::model::deep_copy(stan::model::rvalue(lambda, stan::model::cons_list(stan::model::index_multi(J_item_orig), stan::model::nil_index_list()), "lambda")), 
                         "assigning variable lambda");
-            current_statement_begin__ = 86;
+            current_statement_begin__ = 95;
             stan::math::assign(r, elt_multiply(psi,z));
 
             // validate transformed parameters
@@ -840,22 +888,22 @@ public:
 
             const char* function__ = "validate transformed params";
             (void) function__;  // dummy to suppress unused var warning
-            current_statement_begin__ = 74;
-            current_statement_begin__ = 75;
-            current_statement_begin__ = 76;
+            current_statement_begin__ = 83;
+            current_statement_begin__ = 84;
+            current_statement_begin__ = 85;
             check_greater_or_equal(function__,"psi",psi,0);
-            current_statement_begin__ = 77;
+            current_statement_begin__ = 86;
 
             // model body
             {
-            current_statement_begin__ = 89;
+            current_statement_begin__ = 98;
             validate_non_negative_index("mu", "N", N);
             Eigen::Matrix<T__,Eigen::Dynamic,1>  mu(static_cast<Eigen::VectorXd::Index>(N));
             (void) mu;  // dummy to suppress unused var warning
 
             stan::math::initialize(mu, DUMMY_VAR__);
             stan::math::fill(mu,DUMMY_VAR__);
-            current_statement_begin__ = 90;
+            current_statement_begin__ = 99;
             validate_non_negative_index("sum_psi", "N", N);
             Eigen::Matrix<T__,Eigen::Dynamic,1>  sum_psi(static_cast<Eigen::VectorXd::Index>(N));
             (void) sum_psi;  // dummy to suppress unused var warning
@@ -864,35 +912,43 @@ public:
             stan::math::fill(sum_psi,DUMMY_VAR__);
 
 
-            current_statement_begin__ = 91;
+            current_statement_begin__ = 100;
             for (int n = 1; n <= N; ++n) {
 
-                current_statement_begin__ = 93;
+                current_statement_begin__ = 102;
                 stan::math::assign(get_base1_lhs(mu,n,"mu",1), (((get_base1(r,get_base1(J_item1,n,"J_item1",1),"r",1) - get_base1(r,get_base1(J_item2,n,"J_item2",1),"r",1)) + (get_base1(lambda,get_base1(J_item1,n,"J_item1",1),"lambda",1) * get_base1(eta,get_base1(J_person,n,"J_person",1),get_base1(J_trait1,n,"J_trait1",1),"eta",1))) - (get_base1(lambda,get_base1(J_item2,n,"J_item2",1),"lambda",1) * get_base1(eta,get_base1(J_person,n,"J_person",1),get_base1(J_trait2,n,"J_trait2",1),"eta",1))));
-                current_statement_begin__ = 97;
+                current_statement_begin__ = 106;
                 stan::math::assign(get_base1_lhs(sum_psi,n,"sum_psi",1), sqrt((pow(get_base1(psi,get_base1(J_item1,n,"J_item1",1),"psi",1),2) + pow(get_base1(psi,get_base1(J_item2,n,"J_item2",1),"psi",1),2))));
-                current_statement_begin__ = 98;
+                current_statement_begin__ = 107;
                 stan::math::assign(get_base1_lhs(mu,n,"mu",1), (get_base1(mu,n,"mu",1) / get_base1(sum_psi,n,"sum_psi",1)));
             }
-            current_statement_begin__ = 100;
-            if (as_bool(logical_eq(ncat,2))) {
+            current_statement_begin__ = 109;
+            if (as_bool((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))))) {
 
-                current_statement_begin__ = 101;
+                current_statement_begin__ = 110;
                 for (int n = 1; n <= N; ++n) {
 
-                    current_statement_begin__ = 104;
-                    stan::math::assign(get_base1_lhs(mu,n,"mu",1), (get_base1(mu,n,"mu",1) + (-(get_base1(gamma,get_base1(J_itemC,n,"J_itemC",1),"gamma",1)) / get_base1(sum_psi,n,"sum_psi",1))));
-                    current_statement_begin__ = 106;
-                    lp_accum__.add(bernoulli_log<propto__>(get_base1(Y,n,"Y",1), Phi(get_base1(mu,n,"mu",1))));
+                    current_statement_begin__ = 113;
+                    stan::math::assign(get_base1_lhs(mu,n,"mu",1), Phi((get_base1(mu,n,"mu",1) - (get_base1(gamma,get_base1(J_itemC,n,"J_itemC",1),"gamma",1) / get_base1(sum_psi,n,"sum_psi",1)))));
                 }
-                current_statement_begin__ = 109;
-                lp_accum__.add(normal_log<propto__>(gamma, 0, 3));
-            } else if (as_bool(logical_gt(ncat,2))) {
+                current_statement_begin__ = 116;
+                if (as_bool(logical_eq(family,1))) {
 
-                current_statement_begin__ = 111;
+                    current_statement_begin__ = 117;
+                    lp_accum__.add(bernoulli_log<propto__>(Yint, mu));
+                } else if (as_bool(logical_eq(family,3))) {
+
+                    current_statement_begin__ = 119;
+                    lp_accum__.add(beta_log<propto__>(Yreal, multiply(mu,get_base1(disp,1,"disp",1)), multiply(subtract(1,mu),get_base1(disp,1,"disp",1))));
+                }
+                current_statement_begin__ = 122;
+                lp_accum__.add(normal_log<propto__>(gamma, 0, 3));
+            } else if (as_bool(logical_eq(family,2))) {
+
+                current_statement_begin__ = 125;
                 for (int n = 1; n <= N; ++n) {
                     {
-                    current_statement_begin__ = 113;
+                    current_statement_begin__ = 127;
                     validate_non_negative_index("thres", "(ncat - 1)", (ncat - 1));
                     Eigen::Matrix<T__,Eigen::Dynamic,1>  thres(static_cast<Eigen::VectorXd::Index>((ncat - 1)));
                     (void) thres;  // dummy to suppress unused var warning
@@ -902,28 +958,28 @@ public:
                     stan::math::assign(thres,divide(get_base1(gamma_ord,get_base1(J_itemC,n,"J_itemC",1),"gamma_ord",1),get_base1(sum_psi,n,"sum_psi",1)));
 
 
-                    current_statement_begin__ = 115;
-                    lp_accum__.add(cumulative_Phi_lpmf<propto__>(get_base1(Y,n,"Y",1), get_base1(mu,n,"mu",1), thres, pstream__));
+                    current_statement_begin__ = 129;
+                    lp_accum__.add(cumulative_Phi_lpmf<propto__>(get_base1(Yint,n,"Yint",1), get_base1(mu,n,"mu",1), thres, pstream__));
                     }
                 }
-                current_statement_begin__ = 118;
+                current_statement_begin__ = 132;
                 for (int i = 1; i <= N_itemC; ++i) {
 
-                    current_statement_begin__ = 119;
+                    current_statement_begin__ = 133;
                     lp_accum__.add(normal_log<propto__>(get_base1(gamma_ord,i,"gamma_ord",1), 0, 3));
                 }
             }
-            current_statement_begin__ = 123;
+            current_statement_begin__ = 137;
             lp_accum__.add(normal_log<propto__>(lambda_pos, 1, 0.5));
-            current_statement_begin__ = 124;
+            current_statement_begin__ = 138;
             lp_accum__.add(normal_log<propto__>(lambda_neg, -(1), 0.5));
-            current_statement_begin__ = 125;
+            current_statement_begin__ = 139;
             lp_accum__.add(normal_log<propto__>(psi_est, 1, 0.29999999999999999));
-            current_statement_begin__ = 126;
+            current_statement_begin__ = 140;
             lp_accum__.add(lkj_corr_cholesky_log<propto__>(L_trait, 1));
-            current_statement_begin__ = 127;
+            current_statement_begin__ = 141;
             lp_accum__.add(normal_log<propto__>(to_vector(z_trait), 0, 1));
-            current_statement_begin__ = 128;
+            current_statement_begin__ = 142;
             lp_accum__.add(normal_log<propto__>(z, 0, 1));
             }
 
@@ -960,6 +1016,7 @@ public:
         names__.push_back("z_trait");
         names__.push_back("L_trait");
         names__.push_back("z");
+        names__.push_back("disp");
         names__.push_back("eta");
         names__.push_back("lambda");
         names__.push_back("psi");
@@ -972,10 +1029,10 @@ public:
         dimss__.resize(0);
         std::vector<size_t> dims__;
         dims__.resize(0);
-        dims__.push_back((logical_eq(ncat,2) ? N_itemC : 0 ));
+        dims__.push_back(((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 ));
         dimss__.push_back(dims__);
         dims__.resize(0);
-        dims__.push_back((logical_gt(ncat,2) ? N_itemC : 0 ));
+        dims__.push_back((logical_eq(family,2) ? N_itemC : 0 ));
         dims__.push_back((ncat - 1));
         dimss__.push_back(dims__);
         dims__.resize(0);
@@ -997,6 +1054,9 @@ public:
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(N_item);
+        dimss__.push_back(dims__);
+        dims__.resize(0);
+        dims__.push_back((logical_eq(family,3) ? 1 : 0 ));
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(N_person);
@@ -1030,9 +1090,9 @@ public:
         static const char* function__ = "model_thurstonian_irt_model_namespace::write_array";
         (void) function__;  // dummy to suppress unused var warning
         // read-transform, write parameters
-        vector_d gamma = in__.vector_constrain((logical_eq(ncat,2) ? N_itemC : 0 ));
+        vector_d gamma = in__.vector_constrain(((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 ));
         vector<vector_d> gamma_ord;
-        size_t dim_gamma_ord_0__ = (logical_gt(ncat,2) ? N_itemC : 0 );
+        size_t dim_gamma_ord_0__ = (logical_eq(family,2) ? N_itemC : 0 );
         for (size_t k_0__ = 0; k_0__ < dim_gamma_ord_0__; ++k_0__) {
             gamma_ord.push_back(in__.ordered_constrain((ncat - 1)));
         }
@@ -1042,11 +1102,12 @@ public:
         matrix_d z_trait = in__.matrix_constrain(N_trait,N_person);
         matrix_d L_trait = in__.cholesky_corr_constrain(N_trait);
         vector_d z = in__.vector_constrain(N_item);
-            for (int k_0__ = 0; k_0__ < (logical_eq(ncat,2) ? N_itemC : 0 ); ++k_0__) {
+        vector_d disp = in__.vector_lb_constrain(0,(logical_eq(family,3) ? 1 : 0 ));
+            for (int k_0__ = 0; k_0__ < ((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 ); ++k_0__) {
             vars__.push_back(gamma[k_0__]);
             }
             for (int k_1__ = 0; k_1__ < (ncat - 1); ++k_1__) {
-                for (int k_0__ = 0; k_0__ < (logical_gt(ncat,2) ? N_itemC : 0 ); ++k_0__) {
+                for (int k_0__ = 0; k_0__ < (logical_eq(family,2) ? N_itemC : 0 ); ++k_0__) {
                 vars__.push_back(gamma_ord[k_0__][k_1__]);
                 }
             }
@@ -1072,6 +1133,9 @@ public:
             for (int k_0__ = 0; k_0__ < N_item; ++k_0__) {
             vars__.push_back(z[k_0__]);
             }
+            for (int k_0__ = 0; k_0__ < (logical_eq(family,3) ? 1 : 0 ); ++k_0__) {
+            vars__.push_back(disp[k_0__]);
+            }
 
         if (!include_tparams__) return;
         // declare and define transformed parameters
@@ -1083,7 +1147,7 @@ public:
         (void) DUMMY_VAR__;  // suppress unused var warning
 
         try {
-            current_statement_begin__ = 74;
+            current_statement_begin__ = 83;
             validate_non_negative_index("eta", "N_person", N_person);
             validate_non_negative_index("eta", "N_trait", N_trait);
             matrix_d eta(static_cast<Eigen::VectorXd::Index>(N_person),static_cast<Eigen::VectorXd::Index>(N_trait));
@@ -1091,21 +1155,21 @@ public:
 
             stan::math::initialize(eta, std::numeric_limits<double>::quiet_NaN());
             stan::math::fill(eta,DUMMY_VAR__);
-            current_statement_begin__ = 75;
+            current_statement_begin__ = 84;
             validate_non_negative_index("lambda", "N_item", N_item);
             vector_d lambda(static_cast<Eigen::VectorXd::Index>(N_item));
             (void) lambda;  // dummy to suppress unused var warning
 
             stan::math::initialize(lambda, std::numeric_limits<double>::quiet_NaN());
             stan::math::fill(lambda,DUMMY_VAR__);
-            current_statement_begin__ = 76;
+            current_statement_begin__ = 85;
             validate_non_negative_index("psi", "N_item", N_item);
             vector_d psi(static_cast<Eigen::VectorXd::Index>(N_item));
             (void) psi;  // dummy to suppress unused var warning
 
             stan::math::initialize(psi, std::numeric_limits<double>::quiet_NaN());
             stan::math::fill(psi,DUMMY_VAR__);
-            current_statement_begin__ = 77;
+            current_statement_begin__ = 86;
             validate_non_negative_index("r", "N_item", N_item);
             vector_d r(static_cast<Eigen::VectorXd::Index>(N_item));
             (void) r;  // dummy to suppress unused var warning
@@ -1114,47 +1178,47 @@ public:
             stan::math::fill(r,DUMMY_VAR__);
 
 
-            current_statement_begin__ = 78;
+            current_statement_begin__ = 87;
             stan::math::assign(eta, transpose(multiply(L_trait,z_trait)));
-            current_statement_begin__ = 79;
+            current_statement_begin__ = 88;
             stan::model::assign(psi, 
                         stan::model::cons_list(stan::model::index_multi(J_item_fix), stan::model::nil_index_list()), 
                         psi_fix, 
                         "assigning variable psi");
-            current_statement_begin__ = 80;
+            current_statement_begin__ = 89;
             stan::model::assign(psi, 
                         stan::model::cons_list(stan::model::index_multi(J_item_est), stan::model::nil_index_list()), 
                         psi_est, 
                         "assigning variable psi");
-            current_statement_begin__ = 81;
+            current_statement_begin__ = 90;
             stan::model::assign(psi, 
                         stan::model::cons_list(stan::model::index_multi(J_item_equal), stan::model::nil_index_list()), 
                         stan::model::deep_copy(stan::model::rvalue(psi, stan::model::cons_list(stan::model::index_multi(J_item_orig), stan::model::nil_index_list()), "psi")), 
                         "assigning variable psi");
-            current_statement_begin__ = 82;
+            current_statement_begin__ = 91;
             stan::model::assign(lambda, 
                         stan::model::cons_list(stan::model::index_multi(J_item_pos), stan::model::nil_index_list()), 
                         lambda_pos, 
                         "assigning variable lambda");
-            current_statement_begin__ = 83;
+            current_statement_begin__ = 92;
             stan::model::assign(lambda, 
                         stan::model::cons_list(stan::model::index_multi(J_item_neg), stan::model::nil_index_list()), 
                         lambda_neg, 
                         "assigning variable lambda");
-            current_statement_begin__ = 84;
+            current_statement_begin__ = 93;
             stan::model::assign(lambda, 
                         stan::model::cons_list(stan::model::index_multi(J_item_equal), stan::model::nil_index_list()), 
                         stan::model::deep_copy(stan::model::rvalue(lambda, stan::model::cons_list(stan::model::index_multi(J_item_orig), stan::model::nil_index_list()), "lambda")), 
                         "assigning variable lambda");
-            current_statement_begin__ = 86;
+            current_statement_begin__ = 95;
             stan::math::assign(r, elt_multiply(psi,z));
 
             // validate transformed parameters
-            current_statement_begin__ = 74;
-            current_statement_begin__ = 75;
-            current_statement_begin__ = 76;
+            current_statement_begin__ = 83;
+            current_statement_begin__ = 84;
+            current_statement_begin__ = 85;
             check_greater_or_equal(function__,"psi",psi,0);
-            current_statement_begin__ = 77;
+            current_statement_begin__ = 86;
 
             // write transformed parameters
             for (int k_1__ = 0; k_1__ < N_trait; ++k_1__) {
@@ -1174,7 +1238,7 @@ public:
 
             if (!include_gqs__) return;
             // declare and define generated quantities
-            current_statement_begin__ = 132;
+            current_statement_begin__ = 146;
             validate_non_negative_index("Cor_trait", "N_trait", N_trait);
             matrix_d Cor_trait(static_cast<Eigen::VectorXd::Index>(N_trait),static_cast<Eigen::VectorXd::Index>(N_trait));
             (void) Cor_trait;  // dummy to suppress unused var warning
@@ -1183,11 +1247,11 @@ public:
             stan::math::fill(Cor_trait,DUMMY_VAR__);
 
 
-            current_statement_begin__ = 133;
+            current_statement_begin__ = 147;
             stan::math::assign(Cor_trait, multiply_lower_tri_self_transpose(L_trait));
 
             // validate generated quantities
-            current_statement_begin__ = 132;
+            current_statement_begin__ = 146;
             stan::math::check_corr_matrix(function__,"Cor_trait",Cor_trait);
 
             // write generated quantities
@@ -1231,13 +1295,13 @@ public:
                                  bool include_tparams__ = true,
                                  bool include_gqs__ = true) const {
         std::stringstream param_name_stream__;
-        for (int k_0__ = 1; k_0__ <= (logical_eq(ncat,2) ? N_itemC : 0 ); ++k_0__) {
+        for (int k_0__ = 1; k_0__ <= ((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 ); ++k_0__) {
             param_name_stream__.str(std::string());
             param_name_stream__ << "gamma" << '.' << k_0__;
             param_names__.push_back(param_name_stream__.str());
         }
         for (int k_1__ = 1; k_1__ <= (ncat - 1); ++k_1__) {
-            for (int k_0__ = 1; k_0__ <= (logical_gt(ncat,2) ? N_itemC : 0 ); ++k_0__) {
+            for (int k_0__ = 1; k_0__ <= (logical_eq(family,2) ? N_itemC : 0 ); ++k_0__) {
                 param_name_stream__.str(std::string());
                 param_name_stream__ << "gamma_ord" << '.' << k_0__ << '.' << k_1__;
                 param_names__.push_back(param_name_stream__.str());
@@ -1275,6 +1339,11 @@ public:
         for (int k_0__ = 1; k_0__ <= N_item; ++k_0__) {
             param_name_stream__.str(std::string());
             param_name_stream__ << "z" << '.' << k_0__;
+            param_names__.push_back(param_name_stream__.str());
+        }
+        for (int k_0__ = 1; k_0__ <= (logical_eq(family,3) ? 1 : 0 ); ++k_0__) {
+            param_name_stream__.str(std::string());
+            param_name_stream__ << "disp" << '.' << k_0__;
             param_names__.push_back(param_name_stream__.str());
         }
 
@@ -1317,13 +1386,13 @@ public:
                                    bool include_tparams__ = true,
                                    bool include_gqs__ = true) const {
         std::stringstream param_name_stream__;
-        for (int k_0__ = 1; k_0__ <= (logical_eq(ncat,2) ? N_itemC : 0 ); ++k_0__) {
+        for (int k_0__ = 1; k_0__ <= ((primitive_value(logical_eq(family,1)) || primitive_value(logical_eq(family,3))) ? N_itemC : 0 ); ++k_0__) {
             param_name_stream__.str(std::string());
             param_name_stream__ << "gamma" << '.' << k_0__;
             param_names__.push_back(param_name_stream__.str());
         }
         for (int k_1__ = 1; k_1__ <= (ncat - 1); ++k_1__) {
-            for (int k_0__ = 1; k_0__ <= (logical_gt(ncat,2) ? N_itemC : 0 ); ++k_0__) {
+            for (int k_0__ = 1; k_0__ <= (logical_eq(family,2) ? N_itemC : 0 ); ++k_0__) {
                 param_name_stream__.str(std::string());
                 param_name_stream__ << "gamma_ord" << '.' << k_0__ << '.' << k_1__;
                 param_names__.push_back(param_name_stream__.str());
@@ -1359,6 +1428,11 @@ public:
         for (int k_0__ = 1; k_0__ <= N_item; ++k_0__) {
             param_name_stream__.str(std::string());
             param_name_stream__ << "z" << '.' << k_0__;
+            param_names__.push_back(param_name_stream__.str());
+        }
+        for (int k_0__ = 1; k_0__ <= (logical_eq(family,3) ? 1 : 0 ); ++k_0__) {
+            param_name_stream__.str(std::string());
+            param_name_stream__ << "disp" << '.' << k_0__;
             param_names__.push_back(param_name_stream__.str());
         }
 

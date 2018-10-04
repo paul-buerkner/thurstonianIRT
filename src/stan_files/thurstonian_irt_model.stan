@@ -22,8 +22,15 @@ functions {
    }
 }
 data {
+  // model type
+  int<lower=1,upper=3> family;
+  // family == 1: bernoulli
+  // family == 2: cumulative
+  // family == 3: beta
   int<lower=1> N;  // total number of observations
-  int Y[N];  // response variable
+  // response variable
+  int Yint[family == 1 || family == 2 ? N : 0];
+  real Yreal[family == 3 ? N : 0];
   int<lower=1> N_item;
   int<lower=1> N_itemC;  // item pairs
   int<lower=1> N_person;
@@ -48,8 +55,8 @@ data {
   int<lower=0> N_item_equal;
   int<lower=1> J_item_equal[N_item_equal];
   int<lower=1> J_item_orig[N_item_equal];
-  // number of response categories determines the distribution
-  // ncat == 2: bernoulli; ncat > 2: cumulative
+  // number of response categories in ordinal models
+  // should be set to 2 for other families
   int<lower=2> ncat;
 }
 transformed data {
@@ -57,9 +64,9 @@ transformed data {
   psi_fix = rep_vector(1.0, N_item_fix);
 }
 parameters {
-  // item thresholds depend on model type
-  vector[ncat == 2 ? N_itemC : 0] gamma;
-  ordered[ncat - 1] gamma_ord[ncat > 2 ? N_itemC : 0];
+  // item thresholds depend on the family
+  vector[family == 1 || family == 3 ? N_itemC : 0] gamma;
+  ordered[ncat - 1] gamma_ord[family == 2 ? N_itemC : 0];
   vector<lower=0>[N_item_pos] lambda_pos;  // item loadings
   vector<upper=0>[N_item_neg] lambda_neg;  // item loadings
   vector<lower=0>[N_item_est] psi_est;  // estimated item SDs
@@ -68,6 +75,8 @@ parameters {
   // cholesky factor of correlation matrix of traits
   cholesky_factor_corr[N_trait] L_trait;
   vector[N_item] z;  // unscaled random effects
+  // dispersion parameter of the beta family
+  vector<lower=0>[family == 3 ? 1 : 0] disp;
 }
 transformed parameters {
   // latent traits per person
@@ -97,22 +106,27 @@ model {
     sum_psi[n] = sqrt(psi[J_item1[n]]^2 + psi[J_item2[n]]^2);
     mu[n] = mu[n] / sum_psi[n];
   }
-  if (ncat == 2) {
+  if (family == 1 || family == 3) {
     for (n in 1:N) {
       // scale and add intercept
       // use - gamma for consistency with Brown et al. 2011
-      mu[n] += - gamma[J_itemC[n]] / sum_psi[n];
-      // likelihood contribution
-      Y[n] ~ bernoulli(Phi(mu[n]));
+      mu[n] = Phi(mu[n] - gamma[J_itemC[n]] / sum_psi[n]);
+    }
+    // likelihood contribution
+    if (family == 1) {
+      Yint ~ bernoulli(mu);
+    } else if (family == 3) {
+      Yreal ~ beta(mu * disp[1], (1 - mu) * disp[1]);
     }
     // prior for thresholds
     gamma ~ normal(0, 3);
-  } else if (ncat > 2) {
+  } else if (family == 2) {
+    // cumulative models
     for (n in 1:N) {
       // scale thresholds
       vector[ncat - 1] thres = gamma_ord[J_itemC[n]] / sum_psi[n];
       // likelihood contribution
-      Y[n] ~ cumulative_Phi(mu[n], thres);
+      Yint[n] ~ cumulative_Phi(mu[n], thres);
     }
     // prior for thresholds
     for (i in 1:N_itemC) {
