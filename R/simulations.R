@@ -45,7 +45,7 @@
 #' @export
 sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
                           psi = NULL, Phi = NULL, eta = NULL,
-                          family = c("bernoulli", "cumulative", "beta"),
+                          family = c("bernoulli", "cumulative", "beta", "normal"),
                           nblocks_per_trait = 5, nitems_per_block = 3,
                           comb_blocks = c("random", "fixed")) {
   # prepare data in long format to which responses may be added
@@ -161,8 +161,8 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
     data[take, "eta2"] <- eta[p, pdat$trait2]
   }
 
-  data$prob <- prob_response(data)
-  data$response <- sim_response(data$prob, family = family)
+  data$mu <- mean_response(data, family = family)
+  data$response <- sim_response(data$mu, family = family)
   structure(data,
     npersons = npersons, ntraits = ntraits, nblocks = nblocks,
     nitems = nitems, nblocks_per_trait = nblocks_per_trait,
@@ -179,44 +179,48 @@ sim_eta <- function(npersons, Phi) {
   mnormt::rmnorm(npersons, mu, Phi)
 }
 
-sim_response <- function(prob, family = "bernoulli", disp = 20) {
+sim_response <- function(mu, family = "bernoulli", disp = 20) {
   # Args:
-  #   prob: vector or matrix of category probabilities
+  #   mu: vector or matrix of means / category probabilities
   #   disp: dispersion parameter for beta models
-  stopifnot(NCOL(prob) > 0L)
-  if (NCOL(prob) == 1L) {
-    stopifnot(family %in% c("bernoulli", "beta"))
+  stopifnot(NCOL(mu) > 0L)
+  if (NCOL(mu) == 1L) {
+    stopifnot(family %in% c("bernoulli", "beta", "normal"))
     if (family == "bernoulli") {
-      out <- stats::rbinom(length(prob), size = 1, prob = prob)
-    } else {
+      out <- stats::rbinom(length(mu), size = 1, prob = mu)
+    } else if (family == "beta") {
       # mean parameterization of the beta distribution
-      out <- stats::rbeta(length(prob), prob * disp, (1 - prob) * disp)
+      out <- stats::rbeta(length(mu), mu * disp, (1 - mu) * disp)
       # truncate distribution at the extremes
       out[out < 0.001] <- 0.001
       out[out > 0.999] <- 0.999
+    } else if (family == "normal") {
+      out <- stats::rnorm(length(mu), mu)
     }
   } else {
     stopifnot(family %in% "cumulative")
-    cats <- seq_len(NCOL(prob)) - 1
-    out <- apply(prob, 1, function(p) sample(cats, 1, prob = p))
+    cats <- seq_len(NCOL(mu)) - 1
+    out <- apply(mu, 1, function(p) sample(cats, 1, prob = p))
   }
   out
 }
 
 #' @importFrom stats pnorm
-prob_response <- function(data) {
+mean_response <- function(data, family = "bernoulli") {
   # compute category probabilities
   ncat <- NCOL(data$gamma) + 1
   stopifnot(ncat > 1L)
   if (ncat == 2L) {
-    # dichotomous model
-    mu <- with(data,
+    stopifnot(family %in% c("bernoulli", "beta", "normal"))
+    out <- with(data,
       (-gamma + lambda1 * eta1 - lambda2 * eta2) /
         sqrt(psi1^2 + psi2^2)
     )
-    out <- pnorm(mu)
+    if (family %in% c("bernoulli", "beta")) {
+      out <- pnorm(out)
+    }
   } else {
-    # ordinal model
+    stopifnot(family %in% "cumulative")
     sum_psi <- with(data, sqrt(psi1^2 + psi2^2))
     mu <- with(data, lambda1 * eta1 - lambda2 * eta2) / sum_psi
     out <- matrix(ncol = ncat, nrow = length(mu))

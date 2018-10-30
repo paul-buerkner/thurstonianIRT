@@ -5,7 +5,7 @@
 \title{Simulate Thurstonian IRT data}
 \usage{
 sim_TIRT_data(npersons, ntraits, lambda, gamma, psi = NULL, Phi = NULL,
-  eta = NULL, family = c("bernoulli", "cumulative", "beta"),
+  eta = NULL, family = c("bernoulli", "cumulative", "beta", "normal"),
   nblocks_per_trait = 5, nitems_per_block = 3,
   comb_blocks = c("random", "fixed"))
 }
