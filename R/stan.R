@@ -8,9 +8,9 @@
 #' @import Rcpp
 #' @import methods
 #' @export
-make_stan_data <- function(data, blocks = NULL) {
+make_stan_data <- function(data) {
   if (!is.TIRTdata(data)) {
-    data <- make_TIRT_data(data, blocks)
+    stop("'data' should be of class 'TIRTdata'. See ?make_TIRT_data")
   }
   data <- convert_factors(data)
   att <- attributes(data)
@@ -78,17 +78,17 @@ make_stan_data <- function(data, blocks = NULL) {
 
 #' Fit Thurstonian IRT models in Stan
 #'
-#' @inheritParams make_TIRT_data
+#' @param data An object of class \code{'TIRTdata'}. see
+#' \code{\link{make_TIRT_data}} for documentation on how to create one.
 #' @param init Initial values of the parameters.
 #' Defaults to \code{0} as it proved to be most stable.
 #' @param ... Further arguments passed to
 #' \code{\link[rstan:sampling]{rstan::sampling}}.
 #'
-#' @return A \code{TIRTfit} object.
+#' @return A \code{'TIRTfit'} object.
 #'
 #' @export
-fit_TIRT_stan <- function(data, blocks = NULL, init = 0, ...) {
-  data <- make_TIRT_data(data, blocks)
+fit_TIRT_stan <- function(data, init = 0, ...) {
   stan_data <- make_stan_data(data)
   stan_pars = c(
     "Cor_trait", "lambda", "psi", "gamma",

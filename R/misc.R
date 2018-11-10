@@ -108,6 +108,17 @@ as_one_numeric <- function(x, allow_na = FALSE) {
   x
 }
 
+as_one_logical <- function(x, allow_na = FALSE) {
+  # coerce 'x' to TRUE or FALSE if possible
+  s <- substitute(x)
+  x <- as.logical(x)
+  if (length(x) != 1L || anyNA(x) && !allow_na) {
+    s <- substr(deparse_combine(s), 1L, 100L)
+    stop("Cannot coerce ", s, " to a single logical value.")
+  }
+  x
+}
+
 deparse_combine <- function(x, max_char = 100) {
   # combine deparse lines into one string
   out <- collapse(deparse(x))

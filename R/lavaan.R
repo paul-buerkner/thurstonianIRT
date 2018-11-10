@@ -1,6 +1,6 @@
 #' Generate lavaan code for Thurstonian IRT models
 #'
-#' @inheritParams make_TIRT_data
+#' @inheritParams fit_TIRT_stan
 #'
 #' @return A character string of lavaan code
 #' for a Thurstonian IRT model.
@@ -18,9 +18,9 @@
 #' cat(make_lavaan_code(sdata))
 #'
 #' @export
-make_lavaan_code <- function(data, blocks = NULL) {
+make_lavaan_code <- function(data) {
   if (!is.TIRTdata(data)) {
-    data <- make_TIRT_data(data, blocks)
+    stop("'data' should be of class 'TIRTdata'. See ?make_TIRT_data")
   }
   data <- convert_factors(data)
   data <- filter(data, .data$person == unique(.data$person)[1])
@@ -29,6 +29,9 @@ make_lavaan_code <- function(data, blocks = NULL) {
   nitems_per_block <- att[["nitems_per_block"]]
   ntraits <- att[["ntraits"]]
   traits <- seq_len(ntraits)
+  if (isTRUE(att[["partial"]])) {
+    stop("Cannot yet handle partial comparisons when using lavaan.")
+  }
 
   # define factor loadings (lambda)
   lav_loadings <- vector("list", ntraits)
@@ -170,17 +173,16 @@ make_lavaan_code <- function(data, blocks = NULL) {
 
 #' Fit Thurstonian IRT models in lavaan
 #'
-#' @inheritParams make_TIRT_data
+#' @inheritParams fit_TIRT_stan
 #' @param estimator Name of the estimator that should be used.
 #'   See \code{\link[lavaan:lavOptions]{lavOptions}}.
 #' @param ... Further arguments passed to
 #'   \code{\link[lavaan:lavaan]{lavaan}}.
 #'
-#' @return A \code{TIRTfit} object.
+#' @return A \code{'TIRTfit'} object.
 #'
 #' @export
-fit_TIRT_lavaan <- function(data, blocks = NULL, estimator = "ULSMV", ...) {
-  data <- make_TIRT_data(data, blocks)
+fit_TIRT_lavaan <- function(data, estimator = "ULSMV", ...) {
   lavaan_data <- make_sem_data(data)
   lavaan_model <- make_lavaan_code(data)
   fit <- lavaan::lavaan(

@@ -1,6 +1,6 @@
 #' Generate Mplus code for Thurstonian IRT models
 #'
-#' @inheritParams make_TIRT_data
+#' @inheritParams fit_TIRT_stan
 #' @param eta_file optional file name in which predicted
 #'   trait scores should be stored.
 #' @param iter Maximum number of iterations of the
@@ -21,13 +21,13 @@
 #' lapply(make_mplus_code(sdata), cat)
 #'
 #' @export
-make_mplus_code <- function(data, blocks = NULL, iter = 1000,
+make_mplus_code <- function(data, iter = 1000,
                             eta_file = "eta.csv") {
   # TODO: make better interface to Mplus' control parameters
-  iter <- round(as_one_numeric(iter))
   if (!is.TIRTdata(data)) {
-    data <- make_TIRT_data(data, blocks)
+    stop("'data' should be of class 'TIRTdata'. See ?make_TIRT_data")
   }
+  iter <- round(as_one_numeric(iter))
   data <- convert_factors(data)
   data <- filter(data, .data$person == unique(.data$person)[1])
   att <- attributes(data)
@@ -35,6 +35,9 @@ make_mplus_code <- function(data, blocks = NULL, iter = 1000,
   nitems_per_block <- att[["nitems_per_block"]]
   ntraits <- att[["ntraits"]]
   traits <- seq_len(ntraits)
+  if (isTRUE(att[["partial"]])) {
+    stop("Cannot yet handle partial comparisons when using Mplus.")
+  }
 
   # define factor loadings (lambda)
   mplus_loadings <- vector("list", ntraits)
@@ -202,15 +205,14 @@ make_mplus_code <- function(data, blocks = NULL, iter = 1000,
 
 #' Fit Thurstonian IRT models in Mplus
 #'
-#' @inheritParams make_TIRT_data
+#' @inheritParams fit_TIRT_stan
 #' @param ... Further arguments passed to
 #'   \code{\link[MplusAutomation:mplusModeler]{mplusModeler}}.
 #'
-#' @return A \code{TIRTfit} object.
+#' @return A \code{'TIRTfit'} object.
 #'
 #' @export
-fit_TIRT_mplus <- function(data, blocks = NULL, ...) {
-  data <- make_TIRT_data(data, blocks)
+fit_TIRT_mplus <- function(data, ...) {
   file_name <- collapse(sample(0:9, 10, TRUE))
   mplus_data <- make_sem_data(data)
   mplus_model <- make_mplus_code(
