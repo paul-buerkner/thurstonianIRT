@@ -25,6 +25,7 @@ make_lavaan_code <- function(data) {
   data <- convert_factors(data)
   data <- filter(data, .data$person == unique(.data$person)[1])
   att <- attributes(data)
+  family <- check_family(att$family, "lavaan")
   nitems <- att[["nitems"]]
   nitems_per_block <- att[["nitems_per_block"]]
   ntraits <- att[["ntraits"]]
@@ -63,7 +64,7 @@ make_lavaan_code <- function(data) {
     sapply(1:(ntraits - 1),
       function(i) paste0(
         "trait", i, " ~~ ",
-        paste0("trait", (i+1):ntraits, collapse = " + "),
+        paste0("trait", (i + 1):ntraits, collapse = " + "),
         "\n"
      )
     )
@@ -87,7 +88,7 @@ make_lavaan_code <- function(data) {
   # correlated uniqunesses
   lav_cor_uniqueness <- ""
   for (n in 1:(nrow(data) - 1)) {
-    for (m in (n+1):nrow(data)) {
+    for (m in (n + 1):nrow(data)) {
       pos_psi1 <- with(data, item1[n] == item1[m])
       pos_psi2 <- with(data, item2[n] == item2[m])
       neg_psi <- with(data, item2[n] == item1[m])
@@ -132,9 +133,13 @@ make_lavaan_code <- function(data) {
   ))
 
   # fix one uniqueness per block for identification
-  lav_fix_uniqueness <- collapse(
-    "P", seq(1, nitems, nitems_per_block), " == 1\n"
-  )
+  if (family %in% "bernoulli") {
+    lav_fix_uniqueness <- collapse(
+      "P", seq(1, nitems, nitems_per_block), " == 1\n"
+    )
+  } else if (family %in% "normal") {
+    lav_fix_uniqueness <- ""
+  }
 
   # force item parameters of the same item to be equal
   # this happens if the same items is applied in multiple blocks
@@ -185,8 +190,16 @@ make_lavaan_code <- function(data) {
 fit_TIRT_lavaan <- function(data, estimator = "ULSMV", ...) {
   lavaan_data <- make_sem_data(data)
   lavaan_model <- make_lavaan_code(data)
+
+  att <- attributes(data)
+  family <- check_family(att$family, "lavaan")
+  if (family %in% "bernoulli") {
+    ordered <- names(lavaan_data)
+  } else if (family %in% "normal") {
+    ordered <- NULL
+  }
   fit <- lavaan::lavaan(
-    lavaan_model, data = lavaan_data, ordered = names(lavaan_data),
+    lavaan_model, data = lavaan_data, ordered = ordered,
     auto.fix.first = FALSE, auto.th = TRUE,
     parameterization = "theta", estimator = estimator,
     ...

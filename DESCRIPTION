@@ -38,4 +38,4 @@ LinkingTo:
     RcppEigen (>= 0.3.3.4.0)
 SystemRequirements: GNU make
 NeedsCompilation: yes
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1

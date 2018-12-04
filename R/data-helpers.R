@@ -233,3 +233,24 @@ rep_comp <- function(x, comp, nitems_per_block) {
   }
   out
 }
+
+check_family <- function(family, software = NULL) {
+  options <- family_options(software)
+  match.arg(family, options)
+}
+
+family_options <- function(software = NULL) {
+  if (is.null(software)) {
+    all_ops <- c("bernoulli", "cumulative", "beta", "normal")
+    return(all_ops)
+  }
+  software <- match.arg(software, c("stan", "lavaan", "mplus"))
+  if (software == "stan") {
+    out <- c("bernoulli", "cumulative", "beta", "normal")
+  } else if (software == "lavaan") {
+    out <- c("bernoulli", "normal")
+  } else if (software == "mplus") {
+    out <- c("bernoulli")
+  }
+  out
+}

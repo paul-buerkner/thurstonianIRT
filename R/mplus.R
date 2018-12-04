@@ -31,6 +31,7 @@ make_mplus_code <- function(data, iter = 1000,
   data <- convert_factors(data)
   data <- filter(data, .data$person == unique(.data$person)[1])
   att <- attributes(data)
+  family <- check_family(att$family, "mplus")
   nitems <- att[["nitems"]]
   nitems_per_block <- att[["nitems_per_block"]]
   ntraits <- att[["ntraits"]]

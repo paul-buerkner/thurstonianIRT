@@ -32,7 +32,7 @@ make_stan_data <- function(data) {
   )
 
   # prepare family and response values
-  family <- att$family
+  family <- check_family(att$family, "stan")
   options <- c("bernoulli", "cumulative", "beta", "normal")
   out$family <- as.numeric(factor(family, options))
   if (family %in% c("bernoulli", "cumulative")) {
@@ -45,7 +45,13 @@ make_stan_data <- function(data) {
 
   nitems_per_block <- att[["nitems_per_block"]]
   nitems <- att[["nitems"]]
-  out$J_item_fix <- seq(1, nitems, nitems_per_block)
+  if (family %in% c("bernoulli", "cumulative", "beta")) {
+    # fix first item uniqueness per block for identification
+    # TODO: figure out if 'beta' really needs this
+    out$J_item_fix <- seq(1, nitems, nitems_per_block)
+  } else {
+    out$J_item_fix <- integer(0)
+  }
   out$J_item_est <- setdiff(1:nitems, out$J_item_fix)
   if (length(att$dupl_items)) {
     # force item parameters of the same item to be equal
