@@ -176,7 +176,7 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
 
 sim_eta <- function(npersons, Phi) {
   mu <- rep(0, nrow(Phi))
-  mnormt::rmnorm(npersons, mu, Phi)
+  mvtnorm::rmvnorm(npersons, mu, Phi)
 }
 
 sim_response <- function(mu, family = "bernoulli", disp = 20) {
