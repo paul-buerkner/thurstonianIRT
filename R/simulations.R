@@ -236,7 +236,8 @@ mean_response <- function(data, family = "bernoulli") {
 }
 
 make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
-                             comb_blocks = c("fixed", "random")) {
+                             comb_blocks = c("fixed", "random"),
+                             maxtrys_outer = 20, maxtrys_inner = 1e6) {
   comb_blocks <- match.arg(comb_blocks)
   stopifnot((ntraits * nblocks_per_trait) %% nitems_per_block == 0L)
   if (comb_blocks == "fixed") {
@@ -259,7 +260,7 @@ make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
     possible_rows <- seq_len(nrow(out))
     nbpt_chosen <- rep(0, ntraits)
 
-    .choose <- function(nblocks, maxtrys = 20 * nblocks) {
+    .choose <- function(nblocks, maxtrys) {
       # finds suitable blocks
       chosen <- rep(NA, nblocks)
       i <- ntrys <- 1
@@ -283,9 +284,9 @@ make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
 
     i <- 1
     chosen <- rep(NA, nblocks)
-    while (anyNA(chosen) && i <= 20) {
+    while (anyNA(chosen) && i <= maxtrys_outer) {
       i <- i + 1
-      chosen <- .choose(nblocks)
+      chosen <- .choose(nblocks, maxtrys = maxtrys_inner)
     }
     if (anyNA(chosen)) {
       stop("Could not find a set of suitable blocks.")
