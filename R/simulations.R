@@ -14,7 +14,7 @@
 #' @param eta Optional person factor scores. If provided, argument
 #'   \code{Phi} will be ignored.
 #' @param family Name of assumed the response distribution. Either
-#'   \code{"bernoulli"}, \code{"cumulative"}, or \code{"beta"}.
+#'   \code{"bernoulli"}, \code{"cumulative"}, or \code{"gaussian"}.
 #' @param nblocks_per_trait Number of blocks per trait.
 #' @param nitems_per_block Number of items per block.
 #' @param comb_blocks Indicates how to combine traits to blocks.
@@ -45,7 +45,7 @@
 #' @export
 sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
                           psi = NULL, Phi = NULL, eta = NULL,
-                          family = c("bernoulli", "cumulative", "beta", "normal"),
+                          family = "bernoulli",
                           nblocks_per_trait = 5, nitems_per_block = 3,
                           comb_blocks = c("random", "fixed")) {
   # prepare data in long format to which responses may be added
@@ -53,7 +53,7 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
     stop("The number of items per block must divide ",
          "the number of total items.")
   }
-  family <- match.arg(family)
+  family <- check_family(family)
   comb_blocks <- match.arg(comb_blocks)
   nblocks <- ntraits * nblocks_per_trait / nitems_per_block
   nitems <- nitems_per_block * nblocks
@@ -185,7 +185,7 @@ sim_response <- function(mu, family = "bernoulli", disp = 20) {
   #   disp: dispersion parameter for beta models
   stopifnot(NCOL(mu) > 0L)
   if (NCOL(mu) == 1L) {
-    stopifnot(family %in% c("bernoulli", "beta", "normal"))
+    stopifnot(family %in% c("bernoulli", "beta", "gaussian"))
     if (family == "bernoulli") {
       out <- stats::rbinom(length(mu), size = 1, prob = mu)
     } else if (family == "beta") {
@@ -194,7 +194,7 @@ sim_response <- function(mu, family = "bernoulli", disp = 20) {
       # truncate distribution at the extremes
       out[out < 0.001] <- 0.001
       out[out > 0.999] <- 0.999
-    } else if (family == "normal") {
+    } else if (family == "gaussian") {
       out <- stats::rnorm(length(mu), mu)
     }
   } else {
@@ -206,12 +206,12 @@ sim_response <- function(mu, family = "bernoulli", disp = 20) {
 }
 
 #' @importFrom stats pnorm
-mean_response <- function(data, family = "bernoulli") {
+mean_response <- function(data, family) {
   # compute category probabilities
   ncat <- NCOL(data$gamma) + 1
   stopifnot(ncat > 1L)
   if (ncat == 2L) {
-    stopifnot(family %in% c("bernoulli", "beta", "normal"))
+    stopifnot(family %in% c("bernoulli", "beta", "gaussian"))
     out <- with(data,
       (-gamma + lambda1 * eta1 - lambda2 * eta2) /
         sqrt(psi1^2 + psi2^2)

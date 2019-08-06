@@ -137,7 +137,7 @@ make_lavaan_code <- function(data) {
     lav_fix_uniqueness <- collapse(
       "P", seq(1, nitems, nitems_per_block), " == 1\n"
     )
-  } else if (family %in% "normal") {
+  } else if (family %in% "gaussian") {
     lav_fix_uniqueness <- ""
   }
 
@@ -195,7 +195,7 @@ fit_TIRT_lavaan <- function(data, estimator = "ULSMV", ...) {
   family <- check_family(att$family, "lavaan")
   if (family %in% "bernoulli") {
     ordered <- names(lavaan_data)
-  } else if (family %in% "normal") {
+  } else if (family %in% "gaussian") {
     ordered <- NULL
   }
   fit <- lavaan::lavaan(

@@ -33,12 +33,12 @@ make_stan_data <- function(data) {
 
   # prepare family and response values
   family <- check_family(att$family, "stan")
-  options <- c("bernoulli", "cumulative", "beta", "normal")
+  options <- family_options("stan")
   out$family <- as.numeric(factor(family, options))
   if (family %in% c("bernoulli", "cumulative")) {
     out$Yint <- data$response
     out$Yreal <- numeric(0)
-  } else if (family %in% c("beta", "normal")) {
+  } else if (family %in% c("gaussian", "beta")) {
     out$Yint <- integer(0)
     out$Yreal <- data$response
   }

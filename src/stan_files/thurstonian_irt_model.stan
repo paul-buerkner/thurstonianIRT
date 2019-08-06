@@ -26,8 +26,8 @@ data {
   int<lower=1,upper=4> family;
   // family == 1: bernoulli
   // family == 2: cumulative
-  // family == 3: beta
-  // family == 4: normal
+  // family == 3: gaussian
+  // family == 4: beta
   int<lower=1> N;  // total number of observations
   // response variable
   int Yint[family == 1 || family == 2 ? N : 0];
@@ -77,7 +77,8 @@ parameters {
   cholesky_factor_corr[N_trait] L_trait;
   vector[N_item] z;  // unscaled random effects
   // dispersion parameter of the beta family
-  vector<lower=0>[family == 3 ? 1 : 0] disp;
+  // TODO: make comparison specific?
+  vector<lower=0>[family == 4 ? 1 : 0] disp;
 }
 transformed parameters {
   // latent traits per person
@@ -124,17 +125,17 @@ model {
       Yint[n] ~ cumulative_Phi(mu[n], thres);
     }
   } else if (family == 3) {
+    // gaussian models
+    for (n in 1:N) {
+      mu[n] = (mu[n] - gamma[J_itemC[n]]) / sum_psi[n];
+    }
+    Yreal ~ normal(mu, 1);
+  } else if (family == 4) {
     // beta models
     for (n in 1:N) {
       mu[n] = Phi((mu[n] - gamma[J_itemC[n]]) / sum_psi[n]);
     }
     Yreal ~ beta(mu * disp[1], (1 - mu) * disp[1]);
-  } else if (family == 4) {
-    // normal models
-    for (n in 1:N) {
-      mu[n] = (mu[n] - gamma[J_itemC[n]]) / sum_psi[n];
-    }
-    Yreal ~ normal(mu, 1);
   }
   // prior specifications
   if (family == 2) {

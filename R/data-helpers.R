@@ -241,14 +241,16 @@ check_family <- function(family, software = NULL) {
 
 family_options <- function(software = NULL) {
   if (is.null(software)) {
-    all_ops <- c("bernoulli", "cumulative", "beta", "normal")
+    # TODO: the 'beta' family is implemented in Stan but still
+    # needs to be understood theoretically before exporting it
+    all_ops <- c("bernoulli", "cumulative", "gaussian")
     return(all_ops)
   }
   software <- match.arg(software, c("stan", "lavaan", "mplus"))
   if (software == "stan") {
-    out <- c("bernoulli", "cumulative", "beta", "normal")
+    out <- c("bernoulli", "cumulative", "gaussian")
   } else if (software == "lavaan") {
-    out <- c("bernoulli", "normal")
+    out <- c("bernoulli", "gaussian")
   } else if (software == "mplus") {
     out <- c("bernoulli")
   }
