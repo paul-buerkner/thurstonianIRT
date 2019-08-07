@@ -40,5 +40,7 @@ LinkingTo:
     RcppEigen (>= 0.3.3.4.0)
 SystemRequirements: 
     GNU make
+URL: https://github.com/paul-buerkner/thurstonianIRT
+BugReports: https://github.com/paul-buerkner/thurstonianIRT/issues
 NeedsCompilation: yes
 RoxygenNote: 6.1.1
