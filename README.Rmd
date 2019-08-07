@@ -38,11 +38,11 @@ characteristic of forced-choice questionnaires is that participants cannot
 endorse all items at the same time and instead have to make a comparative
 judgement between two or more items. Such a format comes with the hope of
 providing more valid inference in situation where participants have motivation
-to not answer honestly (e.g., personnel selection), but instead respond in a way
-that appears favorable in the given situation. Whether forced-choice
+to not answer honestly (e.g., in personnel selection), but instead respond in a
+way that appears favorable in the given situation. Whether forced-choice
 questionnaires and the corresponding IRT models live up to this hope remains a
-topic of debate (Bürkner, Schulte, & Holling, 2019) but it is in any case
-necessary to provide software for fitting these statistical models both for
+topic of debate (e.g., see Bürkner, Schulte, & Holling, 2019) but it is in any
+case necessary to provide software for fitting these statistical models both for
 practical and research purposes.
 
 In the original formulation, the Thurstonian IRT model works on dichotomous
@@ -59,16 +59,16 @@ Maydeu-Olivares (2011), Brown and Maydeu-Olivares (2012), and Bürkner et al.
 library(thurstonianIRT)
 ```
 
-As a simple example consider a data set of 4 blocks of items each
-containing 3 items (i.e., triplets) for which we have data of 100 participants:
+As a simple example consider a data set of 4 blocks each
+containing 3 items (i.e., triplets) answered by 100 participants.
 
 ```{r}
 data("triplets")
 head(triplets)
 ```
 
-In the data set, a `1` indicates that the first item has been selected over the
-second item while a `0` indicates that the second items has been selected
+In the data set, a 1 indicates that the first item has been selected over the
+second item while a 0 indicates that the second items has been selected
 over the first item. In order to fit a Thurstonian IRT model on this data,
 we have to tell **thurstonianIRT** about the block structure of the items,
 the traits on which the items load, and the sign of these loadings, that is,
@@ -137,11 +137,17 @@ sim_data <- sim_TIRT_data(
 head(sim_data)
 ```
 
-The structure of the data is the same as what we have obtained via 
-the `make_TIRT_data` function above and can readily be passed to the model
+The structure of the data is the same as what we obtain via
+the `make_TIRT_data` function and can readily be passed to the model
 fitting functions.
 
 ## How to install thurstonianIRT
+
+To install the latest release version from CRAN use
+
+```{r, eval = FALSE}
+install.packages("thurstonianIRT")
+```
 
 The current developmental version can be downloaded from github via
 

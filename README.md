@@ -16,13 +16,13 @@ Thurstonian IRT model originally proposed by (Brown & Maydeu-Olivares,
 participants cannot endorse all items at the same time and instead have
 to make a comparative judgement between two or more items. Such a format
 comes with the hope of providing more valid inference in situation where
-participants have motivation to not answer honestly (e.g., personnel
+participants have motivation to not answer honestly (e.g., in personnel
 selection), but instead respond in a way that appears favorable in the
 given situation. Whether forced-choice questionnaires and the
 corresponding IRT models live up to this hope remains a topic of debate
-(Bürkner, Schulte, & Holling, 2019) but it is in any case necessary to
-provide software for fitting these statistical models both for practical
-and research purposes.
+(e.g., see Bürkner, Schulte, & Holling, 2019) but it is in any case
+necessary to provide software for fitting these statistical models both
+for practical and research purposes.
 
 In the original formulation, the Thurstonian IRT model works on
 dichotomous pairwise comparisons and models the probability of endorsing
@@ -39,9 +39,8 @@ How to use thurstonianIRT
 library(thurstonianIRT)
 ```
 
-As a simple example consider a data set of 4 blocks of items each
-containing 3 items (i.e., triplets) for which we have data of 100
-participants:
+As a simple example consider a data set of 4 blocks each containing 3
+items (i.e., triplets) answered by 100 participants.
 
 ``` r
 data("triplets")
@@ -55,13 +54,13 @@ head(triplets)
 #> 6    1    1    1    0    0    1    1    0    0      0      1      1
 ```
 
-In the data set, a `1` indicates that the first item has been selected
-over the second item while a `0` indicates that the second items has
-been selected over the first item. In order to fit a Thurstonian IRT
-model on this data, we have to tell **thurstonianIRT** about the block
-structure of the items, the traits on which the items load, and the sign
-of these loadings, that is, whether items have been inverted. For the
-present data, we specify this as follows:
+In the data set, a 1 indicates that the first item has been selected
+over the second item while a 0 indicates that the second items has been
+selected over the first item. In order to fit a Thurstonian IRT model on
+this data, we have to tell **thurstonianIRT** about the block structure
+of the items, the traits on which the items load, and the sign of these
+loadings, that is, whether items have been inverted. For the present
+data, we specify this as follows:
 
 ``` r
 blocks <-
@@ -157,12 +156,18 @@ head(sim_data)
 #> #   eta2 <dbl>, mu <dbl>, response <int>
 ```
 
-The structure of the data is the same as what we have obtained via the
-`make_TIRT_data` function above and can readily be passed to the model
-fitting functions.
+The structure of the data is the same as what we obtain via the
+`make_TIRT_data` function and can readily be passed to the model fitting
+functions.
 
 How to install thurstonianIRT
 -----------------------------
+
+To install the latest release version from CRAN use
+
+``` r
+install.packages("thurstonianIRT")
+```
 
 The current developmental version can be downloaded from github via
 
