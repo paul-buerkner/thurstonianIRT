@@ -160,8 +160,10 @@ make_TIRT_data <- function(data, blocks, direction = c("smaller", "larger"),
     signs = ulapply(blocks, "[[", "signs"),
     dupl_items = dupl_items,
     traits = unique(ulapply(blocks, "[[", "traits")),
-    partial = partial,
+    format = format,
     family = family,
+    partial = partial,
+    range = range,
     ncat = ncat,
     class = c("TIRTdata", class(out))
   )
