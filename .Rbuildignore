@@ -5,3 +5,5 @@
 ^\.travis\.yml$
 ^README\.Rmd$
 ^LICENSE$
+^cran-comments\.md$
+^CRAN-RELEASE$

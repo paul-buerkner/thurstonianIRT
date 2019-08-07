@@ -6,3 +6,5 @@ src-i386/
 src/init.o
 src/thurstonianIRT.dll
 src/stan_files/thurstonian_irt_model.o
+CRAN-release
+cran-comments.md
