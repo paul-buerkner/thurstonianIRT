@@ -169,7 +169,7 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
     nitems_per_block = nitems_per_block,
     signs = sign(lambda), lambda = lambda, psi = psi, eta = eta,
     traits = paste0("trait", seq_len(ntraits)),
-    family = family,
+    family = family, ncat = NCOL(data$gamma) + 1,
     class = c("TIRTdata", class(data))
   )
 }

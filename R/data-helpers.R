@@ -8,25 +8,56 @@
 #' @param direction Indicates if \code{"smaller"} (the default) or
 #'   \code{"larger"} input values are considered as indicating the favored
 #'   answer.
-#' @param partial A flag to indicate whether partial comparisons are allowed.
+#' @param format Format of the item responses. Either \code{"ranks"} for
+#'   responses in the form of ranks of \code{"pairwise"} for pairwise
+#'   responses.
+#' @param family Name of assumed the response distribution. Either
+#'   \code{"bernoulli"}, \code{"cumulative"}, or \code{"gaussian"}.
+#' @param partial A flag to indicate whether partial comparisons are allowed
+#'   for responses stored in the \code{"ranks"} format.
+#' @param range Numeric vector of length two giving the range of the
+#'   responses when using the \code{"pairwise"} format.
 #'
 #' @return A \code{data.frame} in a specific format and with attributes ready
 #'   for use with other functions of the \pkg{ThurstonianIRT} package.
 #'
 #' @export
 make_TIRT_data <- function(data, blocks, direction = c("smaller", "larger"),
-                           partial = FALSE) {
+                           format = c("ranks", "pairwise"),
+                           family = "bernoulli", partial = FALSE,
+                           range = NULL) {
   if (is.TIRTdata(data)) {
     return(data)
   }
   direction <- match.arg(direction)
-  partial <- as_one_logical(partial)
+  format <- match.arg(format)
+  family <- check_family(family)
   stopifnot(is.TIRTblocks(blocks))
   blocks <- blocks$blocks
   data <- as.data.frame(data)
   npersons <- nrow(data)
   nblocks <- length(blocks)
   nitems_per_block <- length(blocks[[1]]$items)
+  ncat <- 2L
+  if (format == "ranks") {
+    if (family != "bernoulli") {
+      stop("Format 'ranks' requires family 'bernoulli'.")
+    }
+    partial <- as_one_logical(partial)
+  } else if (format == "pairwise") {
+    if (nitems_per_block > 2L) {
+      stop("Format 'pairwise' requires blocks of length 2.")
+    }
+    if (!length(range) == 2L) {
+      stop("Argument 'range' must be of length 2.")
+    }
+    range <- sort(range)
+    if (family == "cumulative") {
+      ncat <- as.integer(range[2] - range[1] + 1)
+    }
+    # partial comparisons are only meaningful for ranked responses
+    partial <- FALSE
+  }
   ncomparisons <- (nitems_per_block * (nitems_per_block - 1)) / 2
   items_all <- ulapply(blocks, "[[", "items")
   nitems <- length(items_all)
@@ -35,6 +66,7 @@ make_TIRT_data <- function(data, blocks, direction = c("smaller", "larger"),
   }
   traits_all <- unique(ulapply(blocks, "[[", "traits"))
   ntraits <- length(traits_all)
+
   out <- tibble::tibble(
     person = rep(1:npersons, ncomparisons * nblocks),
     block = rep(1:nblocks, each = npersons * ncomparisons),
@@ -51,10 +83,9 @@ make_TIRT_data <- function(data, blocks, direction = c("smaller", "larger"),
     sign1 <- rep_comp(signs, 1, nitems_per_block)
     sign2 <- rep_comp(signs, 2, nitems_per_block)
 
-    fblock <- (i - 1) * nitems_per_block
     rows <- out$block == i
     comparison <- out[rows, ]$comparison
-    out[rows, "itemC"] <- comparison + fblock
+    out[rows, "itemC"] <- comparison + (i - 1) * ncomparisons
     out[rows, "trait1"] <- trait1[comparison]
     out[rows, "trait2"] <- trait2[comparison]
     out[rows, "item1"] <- item1[comparison]
@@ -62,23 +93,34 @@ make_TIRT_data <- function(data, blocks, direction = c("smaller", "larger"),
     out[rows, "sign1"] <- sign1[comparison]
     out[rows, "sign2"] <- sign2[comparison]
 
-    response1 <- unname(do.call(c, data[, item1]))
-    response2 <- unname(do.call(c, data[, item2]))
-    if (direction == "smaller") {
-      response <- as.numeric(case_when(
-        response1 < response2 ~ 1,
-        response1 > response2 ~ 0,
-        TRUE ~ NaN
-      ))
-    } else if (direction == "larger") {
-      response <- as.numeric(case_when(
-        response1 > response2 ~ 1,
-        response1 < response2 ~ 0,
-        TRUE ~ NaN
-      ))
+    if (format == "ranks") {
+      response1 <- unname(do.call(c, data[, item1, drop = FALSE]))
+      response2 <- unname(do.call(c, data[, item2, drop = FALSE]))
+      out[rows, "response1"] <- response1
+      out[rows, "response2"] <- response2
+      if (direction == "smaller") {
+        response <- as.numeric(case_when(
+          response1 < response2 ~ 1,
+          response1 > response2 ~ 0,
+          TRUE ~ NaN
+        ))
+      } else if (direction == "larger") {
+        response <- as.numeric(case_when(
+          response1 > response2 ~ 1,
+          response1 < response2 ~ 0,
+          TRUE ~ NaN
+        ))
+      }
+    } else if (format == "pairwise") {
+      # responses are expected to be stored for the first item only
+      response <- unname(do.call(c, data[, item1, drop = FALSE]))
+      if (direction == "smaller") {
+        # invert item responses
+        response <- range[2] - response + range[1]
+      }
+      # the smallest value should be 0
+      response <- response - range[1]
     }
-    out[rows, "response1"] <- response1
-    out[rows, "response2"] <- response2
     out[rows, "response"] <- response
   }
   out$item1 <- factor(out$item1, levels = items_all)
@@ -86,15 +128,18 @@ make_TIRT_data <- function(data, blocks, direction = c("smaller", "larger"),
   out$trait1 <- factor(out$trait1, levels = traits_all)
   out$trait2 <- factor(out$trait2, levels = traits_all)
 
-  is_nan <- is.nan(out$response)
-  any_nan <- any(is_nan)
-  if (any_nan) {
-    if (!partial) {
-      stop("Please set 'partial = TRUE' when using partial comparisons.")
+  # check for partial comparisons
+  if (format == "ranks") {
+    is_nan <- is.nan(out$response)
+    any_nan <- any(is_nan)
+    if (any_nan) {
+      if (!partial) {
+        stop("Please set 'partial = TRUE' when using partial comparisons.")
+      }
+      out <- filter(out, !is_nan)
+    } else {
+      partial <- FALSE
     }
-    out <- filter(out, !is_nan)
-  } else {
-    partial <- FALSE
   }
 
   # check for items being used multiple times in the test
@@ -116,8 +161,8 @@ make_TIRT_data <- function(data, blocks, direction = c("smaller", "larger"),
     dupl_items = dupl_items,
     traits = unique(ulapply(blocks, "[[", "traits")),
     partial = partial,
-    # TODO: allow for other families
-    family = "bernoulli",
+    family = family,
+    ncat = ncat,
     class = c("TIRTdata", class(out))
   )
 }

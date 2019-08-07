@@ -14,21 +14,23 @@ make_stan_data <- function(data) {
   }
   data <- convert_factors(data)
   att <- attributes(data)
+  # should be 2 for all non-ordinal families
+  ncat <- if (!is.null(att$ncat)) att$ncat else 2L
   out = list(
     N = nrow(data),
     N_item = length(unique(c(data$item1, data$item2))),
     N_itemC = length(unique(data$itemC)),
     N_person = length(unique(data$person)),
     N_trait = length(unique(c(data$trait1, data$trait2))),
-    J_item1 = as.numeric(data$item1),
-    J_item2 = as.numeric(data$item2),
-    J_itemC = as.numeric(data$itemC),
-    J_person = as.numeric(data$person),
-    J_trait1 = as.numeric(data$trait1),
-    J_trait2 = as.numeric(data$trait2),
-    J_item_pos = which(att[["signs"]] >= 0),
-    J_item_neg = which(att[["signs"]] < 0),
-    ncat = NCOL(data$gamma) + 1
+    J_item1 = as.array(as.numeric(data$item1)),
+    J_item2 = as.array(as.numeric(data$item2)),
+    J_itemC = as.array(as.numeric(data$itemC)),
+    J_person = as.array(as.numeric(data$person)),
+    J_trait1 = as.array(as.numeric(data$trait1)),
+    J_trait2 = as.array(as.numeric(data$trait2)),
+    J_item_pos = as.array(which(att[["signs"]] >= 0)),
+    J_item_neg = as.array(which(att[["signs"]] < 0)),
+    ncat = ncat
   )
 
   # prepare family and response values
@@ -36,11 +38,11 @@ make_stan_data <- function(data) {
   options <- family_options("stan")
   out$family <- as.numeric(factor(family, options))
   if (family %in% c("bernoulli", "cumulative")) {
-    out$Yint <- data$response
+    out$Yint <- as.array(data$response)
     out$Yreal <- numeric(0)
   } else if (family %in% c("gaussian", "beta")) {
     out$Yint <- integer(0)
-    out$Yreal <- data$response
+    out$Yreal <- as.array(data$response)
   }
 
   nitems_per_block <- att[["nitems_per_block"]]
@@ -48,11 +50,11 @@ make_stan_data <- function(data) {
   if (family %in% c("bernoulli", "cumulative", "beta")) {
     # fix first item uniqueness per block for identification
     # TODO: figure out if 'beta' really needs this
-    out$J_item_fix <- seq(1, nitems, nitems_per_block)
+    out$J_item_fix <- as.array(seq(1, nitems, nitems_per_block))
   } else {
     out$J_item_fix <- integer(0)
   }
-  out$J_item_est <- setdiff(1:nitems, out$J_item_fix)
+  out$J_item_est <- as.array(setdiff(1:nitems, out$J_item_fix))
   if (length(att$dupl_items)) {
     # force item parameters of the same item to be equal
     # this happens if the same items is applied in multiple blocks
@@ -63,15 +65,15 @@ make_stan_data <- function(data) {
       J_item_equal[[i]] <- dup
       J_item_orig[[i]] <- rep(first, length(dup))
     }
-    out$J_item_equal <- unlist(J_item_equal)
-    out$J_item_orig <- unlist(J_item_orig)
+    out$J_item_equal <- as.array(unlist(J_item_equal))
+    out$J_item_orig <- as.array(unlist(J_item_orig))
     # duplicated items should not be part of the other index variables
-    out$J_item_pos <- with(out, setdiff(J_item_pos, J_item_equal))
-    out$J_item_neg <- with(out, setdiff(J_item_neg, J_item_equal))
-    out$J_item_fix <- with(out, setdiff(J_item_fix, J_item_equal))
-    out$J_item_est <- with(out, setdiff(J_item_est, J_item_equal))
+    out$J_item_pos <- as.array(with(out, setdiff(J_item_pos, J_item_equal)))
+    out$J_item_neg <- as.array(with(out, setdiff(J_item_neg, J_item_equal)))
+    out$J_item_fix <- as.array(with(out, setdiff(J_item_fix, J_item_equal)))
+    out$J_item_est <- as.array(with(out, setdiff(J_item_est, J_item_equal)))
   } else {
-    out$J_item_equal <-  out$J_item_orig <- integer(0)
+    out$J_item_equal <- out$J_item_orig <- integer(0)
   }
   out$N_item_pos = length(out$J_item_pos)
   out$N_item_neg = length(out$J_item_neg)

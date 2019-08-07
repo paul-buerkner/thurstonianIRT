@@ -5,7 +5,8 @@
 \title{Prepare data for Thurstonian IRT models}
 \usage{
 make_TIRT_data(data, blocks, direction = c("smaller", "larger"),
-  partial = FALSE)
+  format = c("ranks", "pairwise"), family = "bernoulli",
+  partial = FALSE, range = NULL)
 }
 \arguments{
 \item{data}{An object of class \code{data.frame} containing data of all
@@ -19,7 +20,15 @@ and more. Ignored if data already contains information on the blocks.}
 \code{"larger"} input values are considered as indicating the favored
 answer.}
 
-\item{partial}{A flag to indicate whether partial comparisons are allowed.}
+\item{format}{Format of the item responses. Either \code{"ranks"} for
+responses in the form of ranks of \code{"pairwise"} for pairwise
+responses.}
+
+\item{family}{Name of assumed the response distribution. Either
+\code{"bernoulli"}, \code{"cumulative"}, or \code{"gaussian"}.}
+
+\item{partial}{A flag to indicate whether partial comparisons are allowed
+for responses stored in the \code{"ranks"} format.}
 }
 \value{
 A \code{data.frame} in a specific format and with attributes ready

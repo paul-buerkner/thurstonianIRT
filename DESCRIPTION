@@ -2,12 +2,11 @@ Package: thurstonianIRT
 Encoding: UTF-8
 Type: Package
 Title: Thurstonian IRT models
-Version: 0.8
-Date: 2018-10-04
+Version: 0.9
+Date: 2019-08-07
 Authors@R: person("Paul-Christian", "Bürkner", email = "paul.buerkner@gmail.com",
   role = c("aut", "cre"))
-Description: Fit Thurstonian IRT models using Stan, lavaan, or Mplus
-  behind the scenes.
+Description: Fit Thurstonian IRT models using 'Stan', 'lavaan', or 'Mplus'.
 License: GPL (>=3)
 LazyData: true
 ByteCompile: true
