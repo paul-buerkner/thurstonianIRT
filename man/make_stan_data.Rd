@@ -12,6 +12,21 @@ variables used in the model.}
 }
 \value{
 A list of data ready to be passed to \pkg{Stan}.
+
+#' @examples
+# simulate some data
+sdata <- sim_TIRT_data(
+  npersons = 100,
+  ntraits = 3,
+  nblocks_per_trait = 4,
+  gamma = 0,
+  lambda = c(runif(6, 0.5, 1), runif(6, -1, -0.5)),
+  Phi = diag(3)
+)
+
+# create data ready for use in Stan
+stan_data <- make_stan_data(sdata)
+str(stan_data)
 }
 \description{
 Prepare data for Thurstonian IRT models fitted with Stan

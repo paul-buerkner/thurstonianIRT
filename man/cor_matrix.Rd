@@ -19,3 +19,7 @@ A correlation \code{matrix} of dimension \code{dim}.
 \description{
 Set up Correlation Matrices
 }
+\examples{
+cor_matrix(c(0.2, 0.3, 0.5), dim = 3)
+
+}

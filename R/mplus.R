@@ -18,6 +18,8 @@
 #'   lambda = c(runif(6, 0.5, 1), runif(6, -1, -0.5)),
 #'   Phi = diag(3)
 #' )
+#'
+#' # show the created Mplus code
 #' lapply(make_mplus_code(sdata), cat)
 #'
 #' @export
@@ -211,6 +213,34 @@ make_mplus_code <- function(data, iter = 1000,
 #'   \code{\link[MplusAutomation:mplusModeler]{mplusModeler}}.
 #'
 #' @return A \code{'TIRTfit'} object.
+#'
+#' @examples
+#' # load the data
+#' data("triplets")
+#'
+#' # define the blocks of items
+#' blocks <-
+#'   set_block(c("i1", "i2", "i3"), traits = c("t1", "t2", "t3"),
+#'           signs = c(1, 1, 1)) +
+#'   set_block(c("i4", "i5", "i6"), traits = c("t1", "t2", "t3"),
+#'             signs = c(-1, 1, 1)) +
+#'   set_block(c("i7", "i8", "i9"), traits = c("t1", "t2", "t3"),
+#'             signs = c(1, 1, -1)) +
+#'   set_block(c("i10", "i11", "i12"), traits = c("t1", "t2", "t3"),
+#'             signs = c(1, -1, 1))
+#'
+#' # generate the data to be understood by 'thurstonianIRT'
+#' tdat <- make_TIRT_data(
+#'   triplets, blocks, direction = "larger",
+#'   format = "pairwise", family = "bernoulli", range = c(0, 1)
+#' )
+#'
+#' \dontrun{
+#' # fit the data using Mplus
+#' fit <- fit_TIRT_mplus(tdat)
+#' print(fit)
+#' predict(fit)
+#' }
 #'
 #' @export
 fit_TIRT_mplus <- function(data, ...) {

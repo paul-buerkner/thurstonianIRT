@@ -4,9 +4,9 @@
 \alias{make_TIRT_data}
 \title{Prepare data for Thurstonian IRT models}
 \usage{
-make_TIRT_data(data, blocks, direction = c("smaller", "larger"),
+make_TIRT_data(data, blocks, direction = c("larger", "smaller"),
   format = c("ranks", "pairwise"), family = "bernoulli",
-  partial = FALSE, range = NULL)
+  partial = FALSE, range = c(0, 1))
 }
 \arguments{
 \item{data}{An object of class \code{data.frame} containing data of all
@@ -16,19 +16,26 @@ variables used in the model.}
 \code{\link{set_block}} indicating which items belong to which block, trait
 and more. Ignored if data already contains information on the blocks.}
 
-\item{direction}{Indicates if \code{"smaller"} (the default) or
-\code{"larger"} input values are considered as indicating the favored
+\item{direction}{Indicates if \code{"larger"} (the default) or
+\code{"smaller"} input values are considered as indicating the favored
 answer.}
 
 \item{format}{Format of the item responses. Either \code{"ranks"} for
-responses in the form of ranks of \code{"pairwise"} for pairwise
-responses.}
+responses in ranked format or \code{"pairwise"} for responses in pairwise
+comparison format. If \code{"ranks"}, each item must have its own
+column in the data frame which contains its ranks within the block.
+If \code{"pairwise"}, each existing item combination must have its
+own column named after the combination of the two compared items.}
 
 \item{family}{Name of assumed the response distribution. Either
 \code{"bernoulli"}, \code{"cumulative"}, or \code{"gaussian"}.}
 
 \item{partial}{A flag to indicate whether partial comparisons are allowed
 for responses stored in the \code{"ranks"} format.}
+
+\item{range}{Numeric vector of length two giving the range of the
+responses when using the \code{"pairwise"} format. Defaults
+to \code{c(0, 1)} for use with dichotomous responses.}
 }
 \value{
 A \code{data.frame} in a specific format and with attributes ready
@@ -36,4 +43,33 @@ A \code{data.frame} in a specific format and with attributes ready
 }
 \description{
 Prepare data for Thurstonian IRT models
+}
+\examples{
+# load the data
+data("triplets")
+
+# define the blocks of items
+blocks <-
+  set_block(c("i1", "i2", "i3"), traits = c("t1", "t2", "t3"),
+          signs = c(1, 1, 1)) +
+  set_block(c("i4", "i5", "i6"), traits = c("t1", "t2", "t3"),
+            signs = c(-1, 1, 1)) +
+  set_block(c("i7", "i8", "i9"), traits = c("t1", "t2", "t3"),
+            signs = c(1, 1, -1)) +
+  set_block(c("i10", "i11", "i12"), traits = c("t1", "t2", "t3"),
+            signs = c(1, -1, 1))
+
+# generate the data to be understood by 'thurstonianIRT'
+tdat <- make_TIRT_data(
+  triplets, blocks, direction = "larger",
+  format = "pairwise", family = "bernoulli", range = c(0, 1)
+)
+
+\dontrun{
+# fit the data using Stan
+fit <- fit_TIRT_stan(tdat, chains = 1)
+print(fit)
+predict(fit)
+}
+
 }

@@ -4,6 +4,21 @@
 #'
 #' @return A list of data ready to be passed to \pkg{Stan}.
 #'
+#' #' @examples
+#' # simulate some data
+#' sdata <- sim_TIRT_data(
+#'   npersons = 100,
+#'   ntraits = 3,
+#'   nblocks_per_trait = 4,
+#'   gamma = 0,
+#'   lambda = c(runif(6, 0.5, 1), runif(6, -1, -0.5)),
+#'   Phi = diag(3)
+#' )
+#'
+#' # create data ready for use in Stan
+#' stan_data <- make_stan_data(sdata)
+#' str(stan_data)
+#'
 #' @useDynLib thurstonianIRT, .registration = TRUE
 #' @import Rcpp
 #' @import methods
@@ -94,6 +109,34 @@ make_stan_data <- function(data) {
 #' \code{\link[rstan:sampling]{rstan::sampling}}.
 #'
 #' @return A \code{'TIRTfit'} object.
+#'
+#' @examples
+#' # load the data
+#' data("triplets")
+#'
+#' # define the blocks of items
+#' blocks <-
+#'   set_block(c("i1", "i2", "i3"), traits = c("t1", "t2", "t3"),
+#'           signs = c(1, 1, 1)) +
+#'   set_block(c("i4", "i5", "i6"), traits = c("t1", "t2", "t3"),
+#'             signs = c(-1, 1, 1)) +
+#'   set_block(c("i7", "i8", "i9"), traits = c("t1", "t2", "t3"),
+#'             signs = c(1, 1, -1)) +
+#'   set_block(c("i10", "i11", "i12"), traits = c("t1", "t2", "t3"),
+#'             signs = c(1, -1, 1))
+#'
+#' # generate the data to be understood by 'thurstonianIRT'
+#' tdat <- make_TIRT_data(
+#'   triplets, blocks, direction = "larger",
+#'   format = "pairwise", family = "bernoulli", range = c(0, 1)
+#' )
+#'
+#' \dontrun{
+#' # fit the data using Stan
+#' fit <- fit_TIRT_stan(tdat, chains = 1)
+#' print(fit)
+#' predict(fit)
+#' }
 #'
 #' @export
 fit_TIRT_stan <- function(data, init = 0, ...) {

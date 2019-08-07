@@ -12,10 +12,26 @@ make_sem_data(data)
 \code{\link{make_TIRT_data}} for documentation on how to create one.}
 }
 \value{
-A list of data ready to be passed to \pkg{lavaan}
+A \code{data.frame} ready to be passed to \pkg{lavaan}
 or \pkg{Mplus}.
 }
 \description{
 Prepare data for Thurstonian IRT models fitted with
 lavaan or Mplus
+}
+\examples{
+# simulate some data
+sdata <- sim_TIRT_data(
+  npersons = 100,
+  ntraits = 3,
+  nblocks_per_trait = 4,
+  gamma = 0,
+  lambda = c(runif(6, 0.5, 1), runif(6, -1, -0.5)),
+  Phi = diag(3)
+)
+
+# create data ready for use in SEM software
+sem_data <- make_sem_data(sdata)
+head(sem_data)
+
 }

@@ -27,11 +27,11 @@ about which item belongs to which trait
 }
 \examples{
 set_block(
-  items = c("i1i2", "i1i3", "i2i3"),
+  items = c("i1", "i2", "i3"),
   traits = c("A", "B", "C")
 ) +
 set_block(
-  items = c("i4i5", "i4i6", "i5i6"),
+  items = c("i4", "i5", "i6"),
   traits = c("A", "B", "C")
 )
 

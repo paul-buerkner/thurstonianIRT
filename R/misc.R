@@ -42,6 +42,9 @@ is_equal <- function(x, y, ...) {
 #'
 #' @return A correlation \code{matrix} of dimension \code{dim}.
 #'
+#' @examples
+#' cor_matrix(c(0.2, 0.3, 0.5), dim = 3)
+#'
 #' @export
 cor_matrix <- function(cors, dim, dimnames = NULL) {
   out <- diag(dim)

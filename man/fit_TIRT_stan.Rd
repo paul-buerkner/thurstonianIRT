@@ -22,3 +22,32 @@ A \code{'TIRTfit'} object.
 \description{
 Fit Thurstonian IRT models in Stan
 }
+\examples{
+# load the data
+data("triplets")
+
+# define the blocks of items
+blocks <-
+  set_block(c("i1", "i2", "i3"), traits = c("t1", "t2", "t3"),
+          signs = c(1, 1, 1)) +
+  set_block(c("i4", "i5", "i6"), traits = c("t1", "t2", "t3"),
+            signs = c(-1, 1, 1)) +
+  set_block(c("i7", "i8", "i9"), traits = c("t1", "t2", "t3"),
+            signs = c(1, 1, -1)) +
+  set_block(c("i10", "i11", "i12"), traits = c("t1", "t2", "t3"),
+            signs = c(1, -1, 1))
+
+# generate the data to be understood by 'thurstonianIRT'
+tdat <- make_TIRT_data(
+  triplets, blocks, direction = "larger",
+  format = "pairwise", family = "bernoulli", range = c(0, 1)
+)
+
+\dontrun{
+# fit the data using Stan
+fit <- fit_TIRT_stan(tdat, chains = 1)
+print(fit)
+predict(fit)
+}
+
+}

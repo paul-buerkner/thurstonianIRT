@@ -32,6 +32,8 @@ sdata <- sim_TIRT_data(
   lambda = c(runif(6, 0.5, 1), runif(6, -1, -0.5)),
   Phi = diag(3)
 )
+
+# show the created Mplus code
 lapply(make_mplus_code(sdata), cat)
 
 }
