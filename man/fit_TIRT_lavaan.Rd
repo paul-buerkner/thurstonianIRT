@@ -38,14 +38,14 @@ blocks <-
             signs = c(1, -1, 1))
 
 # generate the data to be understood by 'thurstonianIRT'
-tdat <- make_TIRT_data(
-  triplets, blocks, direction = "larger",
+triplets_long <- make_TIRT_data(
+  data = triplets, blocks = blocks, direction = "larger",
   format = "pairwise", family = "bernoulli", range = c(0, 1)
 )
 
 \dontrun{
 # fit the data using lavaan
-fit <- fit_TIRT_lavaan(tdat)
+fit <- fit_TIRT_lavaan(triplets_long)
 print(fit)
 predict(fit)
 }

@@ -19,7 +19,7 @@ Generate lavaan code for Thurstonian IRT models
 }
 \examples{
 lambdas <- c(runif(6, 0.5, 1), runif(6, -1, -0.5))
-sdata <- sim_TIRT_data(
+sim_data <- sim_TIRT_data(
   npersons = 100,
   ntraits = 3,
   nblocks_per_trait = 4,
@@ -27,6 +27,6 @@ sdata <- sim_TIRT_data(
   lambda = lambdas,
   Phi = diag(3)
 )
-cat(make_lavaan_code(sdata))
+cat(make_lavaan_code(sim_data))
 
 }

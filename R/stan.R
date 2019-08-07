@@ -6,7 +6,7 @@
 #'
 #' #' @examples
 #' # simulate some data
-#' sdata <- sim_TIRT_data(
+#' sim_data <- sim_TIRT_data(
 #'   npersons = 100,
 #'   ntraits = 3,
 #'   nblocks_per_trait = 4,
@@ -16,7 +16,7 @@
 #' )
 #'
 #' # create data ready for use in Stan
-#' stan_data <- make_stan_data(sdata)
+#' stan_data <- make_stan_data(sim_data)
 #' str(stan_data)
 #'
 #' @useDynLib thurstonianIRT, .registration = TRUE
@@ -126,14 +126,14 @@ make_stan_data <- function(data) {
 #'             signs = c(1, -1, 1))
 #'
 #' # generate the data to be understood by 'thurstonianIRT'
-#' tdat <- make_TIRT_data(
-#'   triplets, blocks, direction = "larger",
+#' triplets_long <- make_TIRT_data(
+#'   data = triplets, blocks = blocks, direction = "larger",
 #'   format = "pairwise", family = "bernoulli", range = c(0, 1)
 #' )
 #'
 #' \dontrun{
 #' # fit the data using Stan
-#' fit <- fit_TIRT_stan(tdat, chains = 1)
+#' fit <- fit_TIRT_stan(triplets_long, chains = 1)
 #' print(fit)
 #' predict(fit)
 #' }

@@ -15,7 +15,7 @@ A list of data ready to be passed to \pkg{Stan}.
 
 #' @examples
 # simulate some data
-sdata <- sim_TIRT_data(
+sim_data <- sim_TIRT_data(
   npersons = 100,
   ntraits = 3,
   nblocks_per_trait = 4,
@@ -25,7 +25,7 @@ sdata <- sim_TIRT_data(
 )
 
 # create data ready for use in Stan
-stan_data <- make_stan_data(sdata)
+stan_data <- make_stan_data(sim_data)
 str(stan_data)
 }
 \description{
