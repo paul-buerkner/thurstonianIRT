@@ -161,9 +161,9 @@ remotes::install_github("paul-buerkner/thurstonianIRT")
 ## References
 
 Brown, A., & Maydeu-Olivares, A. (2011). Item response modeling of forced-choice questionnaires. *Educational and Psychological Measurement*, 71(3), 460-502.
-doi:10.1177/0013164410375112
+https://www.doi.org/10.1177/0013164410375112
 
 Brown, A., & Maydeu-Olivares, A. (2012). Fitting a Thurstonian IRT model to forced-choice data using Mplus. *Behavior Research Methods*, 44(4), 1135-1147.
-doi:10.3758/s13428-012-0217-x
+https://www.doi.org/10.3758/s13428-012-0217-x
 
-Bürkner P. C., Schulte N., & Holling H. (2019). On the Statistical and Practical Limitations of Thurstonian IRT Models. *Educational and Psychological Measurement.* doi:10.1177/0013164419832063
+Bürkner P. C., Schulte N., & Holling H. (2019). On the Statistical and Practical Limitations of Thurstonian IRT Models. *Educational and Psychological Measurement.* https://www.doi.org/10.1177/0013164419832063
