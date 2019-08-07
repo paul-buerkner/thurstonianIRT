@@ -1,15 +1,15 @@
-#' Triplets of Pairwise Preferences
+#' Triplets of Pairwise Comparisons
 #'
 #' @description This data set contains synthetic data
 #' of 100 participants on 4 triplets. In each triplet,
-#' participants had to rank the three alternatives according
+#' participants had to rank the three alternative items according
 #' to their preference. Reponses were then converted into
 #' a set of dichotomous pairwise responses between all the
 #' three alternatives. More details can be found in
 #' Brown and Maydeu-Olivares (2011).
 #'
 #' @format A data frame of 100 observations containing
-#'   information on the following 12 variables.
+#'   information on 12 variables.
 #'   Overall, the 12 items measure 3 different traits.
 #'   Items 1, 4, 7, and 10 load on trait 1,
 #'   items 2, 5, 8, and 11 load on trait 2, and
@@ -61,5 +61,5 @@
 #' @source
 #' Brown, A., & Maydeu-Olivares, A. (2011). Item response modeling of
 #' forced-choice questionnaires. Educational and Psychological Measurement,
-#' 71(3), 460-502.
+#' 71(3), 460-502. doi:10.1177/0013164410375112
 "triplets"

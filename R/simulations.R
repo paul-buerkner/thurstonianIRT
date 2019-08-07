@@ -19,7 +19,7 @@
 #' @param nitems_per_block Number of items per block.
 #' @param comb_blocks Indicates how to combine traits to blocks.
 #'   \code{"fixed"} implies a simple non-random design that may combine
-#'   certain tratis which each other disproportionally often. We thus
+#'   certain traits which each other disproportionally often. We thus
 #'   recommend to use a \code{"random"} block design (the default) that
 #'   combines all traits with all other traits equally often on average.
 #'

@@ -14,7 +14,7 @@ Response Theory (IRT) for forced-choice questionnaires, most notably the
 Thurstonian IRT model originally proposed by (Brown & Maydeu-Olivares,
 2011). The key characteristic of forced-choice questionnaires is that
 participants cannot endorse all items at the same time and instead have
-to make a comparative judgement between two or more items. Such a format
+to make a comparative judgment between two or more items. Such a format
 comes with the hope of providing more valid inference in situation where
 participants have motivation to not answer honestly (e.g., in personnel
 selection), but instead respond in a way that appears favorable in the
@@ -184,10 +184,12 @@ References
 Brown, A., & Maydeu-Olivares, A. (2011). Item response modeling of
 forced-choice questionnaires. *Educational and Psychological
 Measurement*, 71(3), 460-502.
+<a href="doi:10.1177/0013164410375112" class="uri">doi:10.1177/0013164410375112</a>
 
 Brown, A., & Maydeu-Olivares, A. (2012). Fitting a Thurstonian IRT model
 to forced-choice data using Mplus. *Behavior Research Methods*, 44(4),
 1135-1147.
+<a href="doi:10.3758/s13428-012-0217-x" class="uri">doi:10.3758/s13428-012-0217-x</a>
 
 Bürkner P. C., Schulte N., & Holling H. (2019). On the Statistical and
 Practical Limitations of Thurstonian IRT Models. *Educational and
