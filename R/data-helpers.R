@@ -46,7 +46,7 @@
 #'   format = "pairwise", family = "bernoulli", range = c(0, 1)
 #' )
 #'
-#' \dontrun{
+#' \donttest{
 #' # fit the data using Stan
 #' fit <- fit_TIRT_stan(triplets_long, chains = 1)
 #' print(fit)

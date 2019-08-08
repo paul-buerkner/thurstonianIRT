@@ -66,7 +66,7 @@ sdata <- sim_TIRT_data(
 head(sdata)
 str(attributes(sdata))
 
-\dontrun{
+\donttest{
 # fit a Thurstonian IRT model using lavaan
 fit <- fit_TIRT_lavaan(sdata)
 print(fit)

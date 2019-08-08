@@ -207,7 +207,7 @@ make_lavaan_code <- function(data) {
 #'   format = "pairwise", family = "bernoulli", range = c(0, 1)
 #' )
 #'
-#' \dontrun{
+#' \donttest{
 #' # fit the data using lavaan
 #' fit <- fit_TIRT_lavaan(triplets_long)
 #' print(fit)

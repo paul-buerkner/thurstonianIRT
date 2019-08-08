@@ -6,10 +6,10 @@
 \alias{thurstonianIRT}
 \title{The 'thurstonianIRT' package.}
 \description{
-This package fits Thurstonian IRT models using 'Stan', 'lavaan',
-  or 'Mplus'. To bring your data into the right format, use the
-  \code{\link{make_TIRT_data}} function. Models can then be fitted via
-  \code{\link{fit_TIRT_stan}}, \code{\link{fit_TIRT_lavaan}}, or
+This package fits Thurstonian Item Response Theory (IRT) models
+  using 'Stan', 'lavaan', or 'Mplus'. To bring your data into the right
+  format, use the \code{\link{make_TIRT_data}} function. Models can then be
+  fitted via \code{\link{fit_TIRT_stan}}, \code{\link{fit_TIRT_lavaan}}, or
   \code{\link{fit_TIRT_mplus}} depending on the desired model fitting engine.
   Data from Thurstonian IRT models can be simulated via
   \code{\link{sim_TIRT_data}}.

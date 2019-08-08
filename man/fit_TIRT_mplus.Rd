@@ -40,7 +40,7 @@ triplets_long <- make_TIRT_data(
   format = "pairwise", family = "bernoulli", range = c(0, 1)
 )
 
-\dontrun{
+\donttest{
 # fit the data using Mplus
 fit <- fit_TIRT_mplus(triplets_long)
 print(fit)
