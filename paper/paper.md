@@ -15,6 +15,7 @@ affiliations:
     index: 1
 date: "11 August 2019"
 bibliography: paper.bib
+# author: Paul-Christian Bürkner
 # output: pdf_document
 ---
 
