@@ -60,7 +60,7 @@ library(thurstonianIRT)
 ```
 
 As a simple example consider a data set of 4 blocks each
-containing 3 items (i.e., triplets) answered by 100 participants.
+containing 3 items (i.e., triplets) answered by 200 participants.
 
 ```{r}
 data("triplets")
@@ -127,7 +127,7 @@ data set we have used above.
 
 ```{r}
 sim_data <- sim_TIRT_data(
-  npersons = 100,
+  npersons = 200,
   ntraits = 3,
   nblocks_per_trait = 4,
   gamma = 0,
