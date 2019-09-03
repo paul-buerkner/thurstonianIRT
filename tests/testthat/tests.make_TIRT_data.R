@@ -17,6 +17,6 @@ test_that("make_TIRT_data works correctly", {
     data = triplets, blocks = blocks, direction = "larger",
     format = "pairwise", family = "bernoulli", range = c(0, 1)
   )
-  expect_equal(NROW(triplets_long), 1200)
+  expect_equal(NROW(triplets_long), NROW(triplets) * 12)
   expect_true(all(triplets_long$response %in% 0:1))
 })
