@@ -90,6 +90,11 @@ make_TIRT_data <- function(data, blocks, direction = c("larger", "smaller"),
   }
   ncomparisons <- (nitems_per_block * (nitems_per_block - 1)) / 2
   items_all <- ulapply(blocks, "[[", "items")
+  if (any(duplicated(items_all))) {
+    stop("Item variables in different blocks needs to have different names. ",
+         "Use the 'names' argument in 'set_block' to equate item ",
+         "parameters across blocks.")
+  }
   nitems <- length(items_all)
   if (nitems != nitems_per_block * nblocks) {
     stop("All blocks should contain the same number of items.")
