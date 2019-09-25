@@ -356,7 +356,7 @@ family_options <- function(software = NULL) {
   } else if (software == "lavaan") {
     out <- c("bernoulli", "gaussian")
   } else if (software == "mplus") {
-    out <- c("bernoulli")
+    out <- c("bernoulli", "gaussian")
   }
   out
 }
