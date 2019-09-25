@@ -71,12 +71,13 @@ make_lavaan_code <- function(data) {
   )
 
   # fix factor loadings of the same item to the same value
-  items_both_dir <- which(
-    1:nitems %in% data$item1 & 1:nitems %in% data$item2
-  )
-  lav_fix_factor_loadings <- collapse(
-    "L", items_both_dir, " == -L", items_both_dir, "n\n"
-  )
+  lav_fix_factor_loadings <- ""
+  items_both_dir <- which(1:nitems %in% data$item1 & 1:nitems %in% data$item2)
+  if (length(items_both_dir)) {
+    lav_fix_factor_loadings <- collapse(
+      "L", items_both_dir, " == -L", items_both_dir, "n\n"
+    )
+  }
 
   # declare uniquenesses (psi)
   lav_uniqueness <- with(data, collapse(
@@ -121,24 +122,34 @@ make_lavaan_code <- function(data) {
   }
 
   # pair's uniqueness is equal to sum of 2 utility uniqunesses
-  psi_item1 <- paste0("P", data$item1)
-  psi_item2 <- paste0("P", data$item2)
-  neg_psi1 <- sapply(paste0(" ", psi_item1, "n "), grepl, lav_cor_uniqueness)
-  neg_psi2 <- sapply(paste0(" ", psi_item2, "n "), grepl, lav_cor_uniqueness)
-  lav_equal_uniqueness <- with(data, collapse(
-    psi_item1, psi_item2, " == ",
-    ifelse(neg_psi1, paste0(" - ", psi_item1, "n"), psi_item1),
-    ifelse(neg_psi2, paste0(" - ", psi_item2, "n"), paste0(" + ", psi_item2)),
-    "\n"
-  ))
+  lav_equal_uniqueness <- ""
+  if (nitems_per_block > 2) {
+    psi_item1 <- paste0("P", data$item1)
+    psi_item2 <- paste0("P", data$item2)
+    neg_psi1 <- sapply(paste0(" ", psi_item1, "n "), grepl, lav_cor_uniqueness)
+    neg_psi2 <- sapply(paste0(" ", psi_item2, "n "), grepl, lav_cor_uniqueness)
+    lav_equal_uniqueness <- with(data, collapse(
+      psi_item1, psi_item2, " == ",
+      ifelse(neg_psi1, paste0(" - ", psi_item1, "n"), psi_item1),
+      ifelse(neg_psi2, paste0(" - ", psi_item2, "n"), paste0(" + ", psi_item2)),
+      "\n"
+    ))
+  }
 
-  # fix one uniqueness per block for identification
+  # fix certain uniquenesses for identification
+  lav_fix_uniqueness <- ""
   if (family %in% "bernoulli") {
-    lav_fix_uniqueness <- collapse(
-      "P", seq(1, nitems, nitems_per_block), " == 1\n"
-    )
-  } else if (family %in% "gaussian") {
-    lav_fix_uniqueness <- ""
+    if (nitems_per_block > 2) {
+      # fix one uniqueness per block for identification
+      lav_fix_uniqueness <- collapse(
+        "P", seq(1, nitems, nitems_per_block), " == 1\n"
+      )
+    } else {
+      # fix all uniquenesses for identification
+      psi_item1 <- paste0("P", data$item1)
+      psi_item2 <- paste0("P", data$item2)
+      lav_fix_uniqueness <- collapse(psi_item1, psi_item2, " == 1\n")
+    }
   }
 
   # force item parameters of the same item to be equal
@@ -169,7 +180,7 @@ make_lavaan_code <- function(data) {
     lav_cor_uniqueness,
     "# pair's uniqueness is equal to sum of 2 utility uniqunesses",
     lav_equal_uniqueness,
-    "# fix one uniqueness per block for identification",
+    "# fix certain uniquenesses for identification",
     lav_fix_uniqueness,
     "# force item parameters of the same item to be equal",
     lav_equal_items

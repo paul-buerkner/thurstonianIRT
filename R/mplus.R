@@ -42,6 +42,11 @@ make_mplus_code <- function(data, iter = 1000,
     stop("Cannot yet handle partial comparisons when using Mplus.")
   }
 
+  mplus_variable <- ""
+  if (family %in% c("bernoulli", "cumulative")) {
+    mplus_variable <- "CATEGORICAL ARE ALL;\n"
+  }
+
   # define factor loadings (lambda)
   mplus_loadings <- vector("list", ntraits)
   for (i in traits) {
@@ -79,12 +84,13 @@ make_mplus_code <- function(data, iter = 1000,
   )
 
   # fix factor loadings of the same item to the same value
-  items_both_dir <- which(
-    1:nitems %in% data$item1 & 1:nitems %in% data$item2
-  )
-  mplus_fix_factor_loadings <- collapse(
-    "L", items_both_dir, " = -L", items_both_dir, "n;\n"
-  )
+  mplus_fix_factor_loadings <- ""
+  items_both_dir <- which(1:nitems %in% data$item1 & 1:nitems %in% data$item2)
+  if (length(items_both_dir)) {
+    mplus_fix_factor_loadings <- collapse(
+      "L", items_both_dir, " = -L", items_both_dir, "n;\n"
+    )
+  }
 
   # declare uniquenesses (psi)
   mplus_uniqueness <- with(data, collapse(
@@ -127,27 +133,40 @@ make_mplus_code <- function(data, iter = 1000,
   }
 
   # pair's uniqueness is equal to sum of 2 utility uniqunesses
-  psi_item1 <- paste0("P", data$item1)
-  psi_item2 <- paste0("P", data$item2)
-  neg_psi1 <- sapply(
-    paste0(" \\(", psi_item1, "n\\);"),
-    grepl, mplus_cor_uniqueness
-  )
-  neg_psi2 <- sapply(
-    paste0(" \\(", psi_item2, "n\\);"),
-    grepl, mplus_cor_uniqueness
-  )
-  mplus_equal_uniqueness <- with(data, collapse(
-    psi_item1, psi_item2, " = ",
-    ifelse(neg_psi1, paste0("- ", psi_item1, "n"), psi_item1),
-    ifelse(neg_psi2, paste0("- ", psi_item2, "n"), paste0(" + ", psi_item2)),
-    ";\n"
-  ))
+  mplus_equal_uniqueness <- ""
+  if (nitems_per_block > 2) {
+    psi_item1 <- paste0("P", data$item1)
+    psi_item2 <- paste0("P", data$item2)
+    neg_psi1 <- sapply(
+      paste0(" \\(", psi_item1, "n\\);"),
+      grepl, mplus_cor_uniqueness
+    )
+    neg_psi2 <- sapply(
+      paste0(" \\(", psi_item2, "n\\);"),
+      grepl, mplus_cor_uniqueness
+    )
+    mplus_equal_uniqueness <- with(data, collapse(
+      psi_item1, psi_item2, " = ",
+      ifelse(neg_psi1, paste0("- ", psi_item1, "n"), psi_item1),
+      ifelse(neg_psi2, paste0("- ", psi_item2, "n"), paste0(" + ", psi_item2)),
+      ";\n"
+    ))
+  }
 
-  # fix one uniqueness per block for identification
-  mplus_fix_uniqueness <- collapse(
-    "P", seq(1, nitems, nitems_per_block), " = 1;\n"
-  )
+  mplus_fix_uniqueness <- ""
+  if (family %in% "bernoulli") {
+    if (nitems_per_block > 2) {
+      # fix one uniqueness per block for identification
+      mplus_fix_uniqueness <- collapse(
+        "P", seq(1, nitems, nitems_per_block), " = 1;\n"
+      )
+    } else {
+      # fix all uniquenesses for identification
+      psi_item1 <- paste0("P", data$item1)
+      psi_item2 <- paste0("P", data$item2)
+      mplus_fix_uniqueness <- collapse(psi_item1, psi_item2, " = 1;\n")
+    }
+  }
 
   # force item parameters of the same item to be equal
   # this happens if the same items is applied in multiple blocks
@@ -169,7 +188,7 @@ make_mplus_code <- function(data, iter = 1000,
       "! Any additional variables should be added below"
     ),
     VARIABLE = collapse_lines(
-      "CATEGORICAL ARE ALL;\n"
+      mplus_variable
     ),
     ANALYSIS = collapse_lines(
       "  ESTIMATOR = ulsmv;",
@@ -193,7 +212,7 @@ make_mplus_code <- function(data, iter = 1000,
       mplus_fix_factor_loadings,
       "! pair's uniqueness is equal to sum of 2 utility uniqunesses",
       mplus_equal_uniqueness,
-      "! fix one uniqueness per block for identification",
+      "! fix certain uniquenesses for identification",
       mplus_fix_uniqueness,
       "! force item parameters of the same item to be equal",
       mplus_equal_items,
