@@ -268,7 +268,11 @@ convert_factors <- function(data) {
 #' Prepare blocks of items
 #'
 #' Prepare blocks of items and incorporate information
-#' about which item belongs to which trait
+#' about which item belongs to which trait. A block
+#' of items is a set of two or more items presented and answered together
+#' by fully ranking them or selecting the most and/or least favorit
+#' in a forced choice format. A whole test usually contains
+#' several blocks and items may reappear in different blocks.
 #'
 #' @param items Names of item comparisons to be combined
 #' into one block. Should correspond to variables in the data.
