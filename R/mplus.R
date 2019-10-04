@@ -286,19 +286,28 @@ fit_TIRT_mplus <- function(data, ...) {
   unlink(paste0(file_name, ".out"))
   unlink(gsub("\"", "", fit$results$input$data$file, fixed = TRUE))
   unlink(fit$results$savedata_info$fileName)
-  # save only the trait scores
+  # save only the trait scores and their SEs
   npersons <- attr(data, "npersons")
   traits <- attr(data, "traits")
-  trait_scores <- fit$results[["savedata"]]
-  ncol_save <- ncol(trait_scores)
+  savedata <- fit$results[["savedata"]]
+  fit$results[["savedata"]] <- NULL
+  ncol_save <- ncol(savedata)
+  trait_scores <- trait_scores_se <-
+    matrix(NA, ncol = length(traits), nrow = npersons)
   if (is.numeric(ncol_save) && length(ncol_save) > 0) {
-    tcols <- (ncol_save - length(traits) + 1):ncol_save
-    fit$results$savedata <- trait_scores[, tcols, drop = FALSE]
-  } else {
-    trait_scores <- matrix(NA, ncol = length(traits), nrow = npersons)
-    colnames(trait_scores) <- traits
-    fit$results$savedata <- trait_scores
+    cnames <- colnames(savedata)
+    tnames <- cnames[grepl("^TRAIT[[:digit:]]+$", cnames)]
+    if (length(tnames)) {
+      trait_scores <- savedata[, tnames, drop = FALSE]
+    }
+    tnames_se <- cnames[grepl("^TRAIT[[:digit:]]+_SE$", cnames)]
+    if (length(tnames)) {
+      trait_scores_se <- savedata[, tnames_se, drop = FALSE]
+    }
   }
+  colnames(trait_scores) <- colnames(trait_scores_se) <- traits
+  fit$results$trait_scores <- trait_scores
+  fit$results$trait_scores_se <- trait_scores_se
   class(fit) <- c("mplusObjectTIRT", class(fit))
   structure(nlist(fit, data), class = "TIRTfit")
 }

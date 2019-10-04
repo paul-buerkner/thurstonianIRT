@@ -24,8 +24,9 @@ predict.TIRTfit <- function(object, ...) {
   fit <- object$fit
   traits <- attributes(object$data)$traits
   if (inherits(fit, "stanfit")) {
+    # post process Stan objects
     out <- as.data.frame(summary(fit, "eta")$summary)
-    if (nrow(out)) {
+    if (NROW(out)) {
       out <- out %>%
         tibble::rownames_to_column(var = "par") %>%
         rename(
@@ -46,20 +47,45 @@ predict.TIRTfit <- function(object, ...) {
         arrange(.data$id)
     }
   } else {
+    # post process Mplus objects
     if (inherits(fit, "mplusObjectTIRT")) {
-      out <- fit$results[["savedata"]]
+      out <- fit$results[["trait_scores"]]
+      if (is.null(out)) {
+        # for backwards compatibility with version < 0.9.3
+        out <- fit$results[["savedata"]]
+      }
+      out <- as.data.frame(out)
+      if (NROW(out)) {
+        ntraits <- ncol(out)
+        out <- out %>%
+          tidyr::gather("trait", "estimate", everything()) %>%
+          mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
+          arrange(.data$id) %>%
+          select("id", "trait", "estimate")
+      }
+      se <- as.data.frame(fit$results[["trait_scores_se"]])
+      if (NROW(se)) {
+        ntraits <- ncol(se)
+        se <- se %>%
+          tidyr::gather("trait", "se", everything()) %>%
+          mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
+          arrange(.data$id) %>%
+          select("id", "trait", "se")
+      }
+      out <- out %>% inner_join(se, by = c("id", "trait"))
     } else if (inherits(fit, "lavaan")) {
-      out <- lavaan::lavPredict(fit, ...)
-    }
-    out <- as.data.frame(out)
-    if (nrow(out)) {
-      ntraits <- ncol(out)
-      out <- out %>%
-        tidyr::gather("trait", "estimate", everything()) %>%
-        mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
-        arrange(.data$id) %>%
-        select("id", "trait", "estimate")
+      # post process lavaan objects
+      out <- as.data.frame(lavaan::lavPredict(fit, ...))
+      if (NROW(out)) {
+        ntraits <- ncol(out)
+        out <- out %>%
+          tidyr::gather("trait", "estimate", everything()) %>%
+          mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
+          arrange(.data$id) %>%
+          select("id", "trait", "estimate")
+      }
     }
   }
   as_tibble(out)
 }
+
