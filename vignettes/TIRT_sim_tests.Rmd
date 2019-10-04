@@ -1,0 +1,199 @@
+---
+title: "Test parameter recovery via simulations with thurstonianIRT"
+author: "Paul Bürkner"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+  toc: yes
+vignette: >
+  %\VignetteIndexEntry{Test parameter recovery via simulations with thurstonianIRT}
+  \usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, SETTINGS-knitr, include=FALSE}
+stopifnot(require(knitr))
+options(width = 90)
+opts_chunk$set(
+  comment = NA,
+  message = FALSE,
+  warning = FALSE,
+  eval = if (isTRUE(exists("params"))) params$EVAL else FALSE,
+  dev = "png",
+  dpi = 150,
+  fig.asp = 0.8,
+  fig.width = 5,
+  out.width = "60%",
+  fig.align = "center"
+)
+```
+
+# Introduction
+
+In this vignette, we will perform a small simulation study to
+test whether the model fitting engines implemented in the thurstonianIRT
+package are able to recover known parameter values from a simulated data set.
+This also extends the automated unit tests implemented in the package
+to check the correctness of the software. For a more extensive simulation
+study using thurstonianIRT, see Bürkner, Schulte, and Holling (2019).
+
+First, we will load a bunch of packages required in the vignette.
+```{r}
+library(thurstonianIRT)
+library(dplyr)
+library(tidyr)
+```
+
+Next, we will set up the simulation condition.
+```{r}
+set.seed(1234)
+npersons <- 500
+ntraits <- 5
+nitems_per_block <- 3
+nblocks_per_trait <- 9
+nblocks <- ntraits * nblocks_per_trait / nitems_per_block
+nitems <- ntraits * nblocks_per_trait
+ncomparisons <- (nitems_per_block * (nitems_per_block - 1)) / 2 * nblocks
+```
+
+Now, we will choose a set of true parameter values.
+```{r}
+set.seed(1234)
+lambda <- runif(nitems, 0.65, 0.96)
+signs <- c(rep(1, ceiling(nitems / 2)), rep(-1, floor(nitems / 2)))
+lambda <- lambda * signs[sample(seq_len(nitems))]
+gamma <- runif(nitems, -1, 1)
+Phi <- diag(5)
+```
+
+Finally, we put all of this together and simulate a data set based
+on the condion and true parameter values.
+```{r}
+sdata <- sim_TIRT_data(
+  npersons = npersons, 
+  ntraits = ntraits, 
+  nitems_per_block = nitems_per_block,
+  nblocks_per_trait = nblocks_per_trait,
+  gamma = gamma,
+  lambda = lambda,
+  Phi = Phi
+)
+```
+
+We know that the chosen simulation condition and parameter values are well
+behaved (this may not be the case in all situations; see Bürkner, Schulte, &
+Holling, 2019). Accordingly, the model fitting engines should show good
+parameter recovery given that they are correctly implemented. We will now go
+ahead and fit the model with all three engines.
+```{r, results="hide"}
+fit_stan <- fit_TIRT_stan(sdata, chains = 1, iter = 1000, warmup = 500)
+fit_lavaan <- fit_TIRT_lavaan(sdata)
+fit_mplus <- fit_TIRT_mplus(sdata)
+```
+
+We can now predict the trait scores of all persons and compare them
+to the true scores, which are stored in the simulated data set.
+```{r}
+eta <- as_tibble(as.data.frame(attributes(sdata)$eta))
+names(eta) <- paste0("trait", 1:ncol(eta))
+true_scores <- eta %>%
+  mutate(id = 1:n()) %>%
+  gather(key = "trait", value = "truth", -id)
+true_summaries <- true_scores %>%
+  group_by(trait) %>%
+  summarise(true_mean = mean(truth), true_sd = sd(truth))
+
+pred <- predict(fit_stan) %>% 
+  bind_rows(predict(fit_lavaan), predict(fit_mplus), .id = "source") %>%
+  mutate(
+    source = as.character(factor(
+      source, levels = 1:3, labels = c("stan", "lavaan", "mplus")
+    )),
+    trait = tolower(trait)
+  ) %>%
+  inner_join(true_scores, by = c("id", "trait"))
+
+pred <- pred %>%
+  inner_join(
+    pred %>%
+      group_by(trait, source) %>%
+      summarise(cor_est_truth = cor(estimate, truth)), 
+    by = c("trait", "source")
+  ) %>%
+  mutate(
+    sign = sign(cor_est_truth),
+    estimate = ifelse(sign %in% -1, -estimate, estimate)
+  ) %>%
+  inner_join(true_summaries, by = "trait") %>%
+  group_by(trait, source) %>%
+  mutate(
+    est_mean = mean(estimate),
+    est_sd = sd(estimate)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    ztruth = (truth - true_mean) / true_sd,
+    zestimate = (estimate - est_mean) / est_sd
+  )
+```
+
+Various measures of model predictive accuracy can be computed, for instance,
+the reliability. For the present simulation condition, we would expect
+the reliability to be roughly between 0.85 and 0.9 for all traits. 
+By looking at the results below, we can verify that this is indeed that case.
+```{r}
+res <- pred %>%
+  group_by(trait, source) %>%
+  summarise(rel = cor(estimate, truth)^2)
+
+res
+```
+
+```{r, include = FALSE}
+testthat::expect_true(all(res$rel > 0.84))
+```
+
+Lastly, we can also compute and investigate the trait correlations between
+different engines so check whether they really estimate equivalent trait scores.
+```{r}
+cor_matrix <- pred %>%
+  mutate(
+    # ensure correct ordering of traits
+    SC = paste0(source, "_", trait),
+    SC = factor(SC, levels = unique(SC))
+  ) %>%
+  select(id, SC, estimate) %>%
+  spread(key = "SC", value = "estimate") %>%
+  bind_cols(eta, .) %>%
+  select(-id) %>%
+  cor()
+```
+
+We would expect the correlations of the estimates of the same trait across
+engines to be very high, that is, higher than 0.95 at least.
+We can verify that this is indeed the case as exemplified for `trait1` below.
+```{r}
+trait1 <- paste0(c("stan", "lavaan", "mplus"), "_trait1")
+round(cor_matrix[trait1, trait1], 2)
+```
+
+```{r, include = FALSE}
+for (i in 1:ntraits) {
+  trait_cols <- paste0(c("stan", "lavaan", "mplus"), "_trait", i)
+  testthat::expect_true(all(cor_matrix[trait_cols, trait_cols] > 0.97))
+}
+```
+
+Taken together, we have seen how to set up and perform a simple simulation
+study to test the parameter recovery of Thurstonian IRT models and, at the
+same time, test the correctness of the thurstonianIRT software.
+
+# References
+
+Bürkner P. C., Schulte N., & Holling H. (2019). On the Statistical and Practical
+Limitations of Thurstonian IRT Models. *Educational and Psychological
+Measurement*. 79(5). 827–854.

@@ -8,3 +8,5 @@
 ^cran-comments\.md$
 ^CRAN-RELEASE$
 ^paper$
+^doc$
+^Meta$
