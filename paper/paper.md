@@ -35,12 +35,18 @@ required to make comparative judgments between two or more items. In this case,
 they would not be able to endorse all items at the same time. Analysing data
 obtained from forced-choice questionnaires requires specialized statistical
 models. One of these models is the Thurstonian Item Response Theory (IRT) model,
-which was originally proposed by @brown2011. Forced-choice questionnaires and
-corresponding statistical models come with the hope of providing more valid
-inference in situations where participants have motivation to lie. Whether they
-live up to this hope remains a topic of debate [e.g., see @buerkner2019] but it
-is in any case necessary to provide software for fitting these statistical
-models both for research and practical purposes.
+which was originally proposed by @brown2011. IRT in general comes with several
+advantages over classical test theory, for instance, the ability to model
+varying item difficulties as well as item factor loadings on the participants'
+traits they are supposed to measure. Moreover, if multiple traits are modeled at
+the same time, their correlation can be incorporated into an IRT model to
+improve the overall estimation accuracy [@brown2011]. In addition to those
+general advantages, forced-choice questionnaires and corresponding IRT models
+specifically come with the hope of providing more valid inference in situations
+where participants have motivation to fake. Whether they live up to this hope
+remains a topic of debate [e.g., see @buerkner2019] but it is in any case
+necessary to provide software for fitting these statistical models both for
+research and practical purposes.
 
 The R package *thurstonianIRT* has been developed to fit various IRT models for
 forced-choice data, in particular the Thurstonian IRT model. In the original
