@@ -4,7 +4,7 @@
 
 * Correctly handle standard errors of trait scores as returned by Mplus.
 * Fix the `triplets` example data to work with lavaan and Mplus without
-convergence issues.
+convergence issues. (#3)
 
 ## New Features
 
@@ -14,6 +14,7 @@ convergence issues.
 
 * Improve the documentation and presentation of the package across the board 
 thanks to Russell S. Pierce, Thomas J. Faulkenberry, and Daniel S. Katz.
+(#2, #5, #7, #8, #9)
 
 
 # thurstonianIRT 0.9.0
