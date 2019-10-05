@@ -145,7 +145,9 @@ The structure of the data is the same as what we obtain via
 the `make_TIRT_data` function and can readily be passed to the model
 fitting functions.
 
-## How to install thurstonianIRT
+## FAQ
+
+### How to install thurstonianIRT
 
 To install the latest release version from CRAN use
 
@@ -161,6 +163,29 @@ if (!requireNamespace("remotes")) {
 }
 remotes::install_github("paul-buerkner/thurstonianIRT")
 ```
+
+### I am new to thurstonianIRT. Where can I start?
+
+After reading the README, you probably have a good overview already over the
+packages purporse and main functionality. You can dive deeper by reading the
+package's documentation perhaps starting with `help("thurstonianIRT")`. If you
+want to perform a simulation study with the package, I recommend you take a look
+at `vignette("TIRT_sim_tests")`.
+
+### Where do I ask questions, propose a new feature, or report a bug?
+
+To ask a question, propose a new feature or report a bug, please open an
+issue on [GitHub](https://github.com/paul-buerkner/thurstonianIRT).
+
+### How can I contribute to thurstonianIRT?
+
+If you want to contribute to thurstonianIRT, you can best do this via the
+package's [GitHub](https://github.com/paul-buerkner/thurstonianIRT) page. There,
+you can fork the repository, open new issues (e.g., to report a bug), or make
+pull requests to improve the software and documentation. I am grateful for all
+kinds of contributions and be they just as small as fixing a typo in the
+documentation.
+
 
 ## References
 
