@@ -183,7 +183,7 @@ If you want to contribute to thurstonianIRT, you can best do this via the
 package's [GitHub](https://github.com/paul-buerkner/thurstonianIRT) page. There,
 you can fork the repository, open new issues (e.g., to report a bug), or make
 pull requests to improve the software and documentation. I am grateful for all
-kinds of contributions and be they just as small as fixing a typo in the
+kinds of contributions, even if they are just as small as fixing a typo in the
 documentation.
 
 
