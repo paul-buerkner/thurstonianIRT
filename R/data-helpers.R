@@ -306,7 +306,19 @@ set_block <- function(items, traits, names = items, signs = 1) {
   out <- list(blocks = list(nlist(items, traits, names, signs)))
   structure(out, class = "TIRTblocks")
 }
+
 #' @rdname set_block
+#' @export
+empty_block <- function() {
+  structure(list(blocks = list()), class = "TIRTblocks")
+}
+
+#' @export
+"+.TIRTblocks" <- function(e1, e2) {
+  stopifnot(is.TIRTblocks(e2))
+  e1$blocks <- c(e1$blocks, e2$blocks)
+  e1
+}
 
 #' Prepare blocks of items from a dataframe
 #'
@@ -339,11 +351,12 @@ set_block <- function(items, traits, names = items, signs = 1) {
 #'    traits = rep(c("t1", "t2", "t3"), times = 4),
 #'    signs = c(1, 1, 1, -1, 1, 1, 1, 1, -1, 1, -1, 1))
 #'
-#' blocks <- set_blocks(blocks = "block",
-#'                      items = "items",
-#'                      traits = "traits",
-#'                      signs = "signs",
-#'                      data = block_info)
+#' blocks <- set_blocks_from_df(
+#'    blocks = "block",
+#'    items = "items",
+#'    traits = "traits",
+#'    signs = "signs",
+#'    data = block_info)
 #' )
 #'
 #' @export
@@ -366,7 +379,7 @@ set_blocks_from_df <- function(blocks, items, traits, names = items, signs, data
     stop("Only one unique block ID provided.")
   }
 
-  # Fill list with each the set_block call for each block
+  # Fill list with the set_block call for each block
   block_list <- list()
   for(i in 1:length(block_ids)){
     block_list[[i]] <- set_block(items = data[data[ , blocks] == block_ids[i], items],
@@ -381,19 +394,6 @@ set_blocks_from_df <- function(blocks, items, traits, names = items, signs, data
     out$blocks <- c(out$blocks, block_list[[j]]$blocks)
   }
   structure(out, class = "TIRTblocks")
-}
-#' @rdname set_blocks_from_df
-
-#' @export
-empty_block <- function() {
-  structure(list(blocks = list()), class = "TIRTblocks")
-}
-
-#' @export
-"+.TIRTblocks" <- function(e1, e2) {
-  stopifnot(is.TIRTblocks(e2))
-  e1$blocks <- c(e1$blocks, e2$blocks)
-  e1
 }
 
 is.TIRTdata <- function(x) {
