@@ -292,6 +292,7 @@ convert_factors <- function(data) {
 #'   traits = c("A", "B", "C")
 #' )
 #'
+#' @seealso \code{\link{set_blocks_from_df}}
 #' @export
 set_block <- function(items, traits, names = items, signs = 1) {
   stopifnot(length(items) == length(traits))
@@ -320,11 +321,11 @@ empty_block <- function() {
   e1
 }
 
-#' Prepare blocks of items from a dataframe
+#' Prepare blocks of items from a data frame
 #'
 #' Prepare blocks of items and incorporate information
 #' about which item belongs to which trait from a pre-existing dataframe.
-#' This is a wrapper function for "set_blocks()", eliminating the need
+#' This is a wrapper function for \code{\link{set_block}}, eliminating the need
 #' to manually set each item, trait, name and sign (loading) info per block.
 #'
 #' A block of items is a set of two or more items presented and answered
@@ -346,54 +347,56 @@ empty_block <- function() {
 #'
 #' @examples
 #' block_info <- data.frame(
-#'    block = rep(1:4, each = 3),
-#'    items = c("i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8", "i9", "i10", "i11", "i12"),
-#'    traits = rep(c("t1", "t2", "t3"), times = 4),
-#'    signs = c(1, 1, 1, -1, 1, 1, 1, 1, -1, 1, -1, 1))
-#'
-#' blocks <- set_blocks_from_df(
-#'    blocks = "block",
-#'    items = "items",
-#'    traits = "traits",
-#'    signs = "signs",
-#'    data = block_info)
+#'   block = rep(1:4, each = 3),
+#'   items = c("i1", "i2", "i3", "i4", "i5", "i6",
+#'             "i7", "i8", "i9", "i10", "i11", "i12"),
+#'   traits = rep(c("t1", "t2", "t3"), times = 4),
+#'   signs = c(1, 1, 1, -1, 1, 1, 1, 1, -1, 1, -1, 1)
 #' )
 #'
+#' blocks <- set_blocks_from_df(
+#'   data = block_info,
+#'   blocks = "block",
+#'   items = "items",
+#'   traits = "traits",
+#'   signs = "signs"
+#' )
+#'
+#' @seealso \code{\link{set_block}}
 #' @export
-set_blocks_from_df <- function(blocks, items, traits, names = items, signs, data){
-
-  # Check each block has the same number of items via `table` call
-  block_ids <- as.character(data[ , blocks])
-  nitems_per_block <- table(as.character(data[ , blocks]))
-  if(all(nitems_per_block) != TRUE){
+set_blocks_from_df <- function(data, blocks = "block", items = "item",
+                               traits = "trait", names = items,
+                               signs = "sign") {
+  # input checks
+  data <- as.data.frame(data)
+  blocks <- as_one_character(blocks)
+  items <- as_one_character(items)
+  traits <- as_one_character(traits)
+  names <- as_one_character(names)
+  signs <- as_one_character(signs)
+  # check each block has the same number of items
+  block_ids <- as.character(data[[blocks]])
+  nitems_per_block <- table(as.character(data[[blocks]]))
+  if (length(unique(nitems_per_block)) > 1L) {
     stop("All blocks should contain the same number of items.")
   }
-  if(any(nitems_per_block < 2) == TRUE){
+  if (any(nitems_per_block < 2)) {
     stop("Blocks should contain more than one item.")
   }
-
-  # Save unique block_ids and number of blocks
+  # save unique block_ids and number of blocks
   block_ids <- unique(block_ids)
   nblocks <- length(block_ids)
-  if(nblocks == 1){
-    stop("Only one unique block ID provided.")
-  }
-
-  # Fill list with the set_block call for each block
+  # fill list with the set_block call for each block
   block_list <- list()
-  for(i in 1:length(block_ids)){
-    block_list[[i]] <- set_block(items = data[data[ , blocks] == block_ids[i], items],
-                                 traits = data[data[ , blocks] == block_ids[i], traits],
-                                 names = data[data[ , blocks] == block_ids[i], names],
-                                 signs = data[data[ , blocks] == block_ids[i], signs])
+  for(i in seq_along(block_ids)) {
+    sel <- data[[blocks]] == block_ids[i]
+    block_list[[i]] <- set_block(
+      items = data[sel, items], traits = data[sel, traits],
+      names = data[sel, names], signs = data[sel, signs]
+    )
   }
-
-  # Initialise and concatenate ala "+.TIRTblocks"
-  out <- block_list[[1]]
-  for(j in 2:nblocks){
-    out$blocks <- c(out$blocks, block_list[[j]]$blocks)
-  }
-  structure(out, class = "TIRTblocks")
+  # concatenate blocks
+  Reduce("+", block_list)
 }
 
 is.TIRTdata <- function(x) {

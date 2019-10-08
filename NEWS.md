@@ -1,3 +1,10 @@
+# thurstonianIRT 0.10.0++
+
+## New Features
+
+Specify multiple blocks at once via `set_blocks_from_df`
+thanks to @awhug. (#11)
+
 # thurstonianIRT 0.10.0
 
 ## Bug Fixes

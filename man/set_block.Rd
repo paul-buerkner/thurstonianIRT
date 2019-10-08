@@ -40,3 +40,6 @@ set_block(
 )
 
 }
+\seealso{
+\code{\link{set_blocks_from_df}}
+}
