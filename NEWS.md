@@ -1,8 +1,13 @@
 # thurstonianIRT 0.10.0++
 
+## Bug Fixes
+
+* Fix usage of `gamma` parameters in `sim_TIRT_data`
+thanks to @IanEisenberg. (#13)
+
 ## New Features
 
-Specify multiple blocks at once via `set_blocks_from_df`
+* Specify multiple blocks at once via `set_blocks_from_df`
 thanks to @awhug. (#11)
 
 # thurstonianIRT 0.10.0

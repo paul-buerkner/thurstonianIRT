@@ -140,10 +140,10 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
   }
   if (family == "cumulative") {
     stopifnot(NCOL(gamma) > 1L)
-    data$gamma <- gamma[data$comparison, , drop = FALSE]
+    data$gamma <- gamma[data$itemC, , drop = FALSE]
   } else {
     stopifnot(NCOL(gamma) == 1L)
-    data$gamma <- as.vector(gamma)[data$comparison]
+    data$gamma <- as.vector(gamma)[data$itemC]
   }
   if (is.list(lambda)) {
     if (length(lambda) != ntraits) {
