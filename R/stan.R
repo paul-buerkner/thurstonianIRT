@@ -153,3 +153,50 @@ fit_TIRT_stan <- function(data, init = 0, ...) {
   structure(nlist(fit, data), class = "TIRTfit")
 }
 
+#' @export
+get_TIRT_params_stan <- function(fitted_model) {
+  # extract fit parameters from the stanmodel object
+  components = rstan::extract(fitted_model)
+  # person parameters
+  fit_eta = apply(components$eta,c(2,3),mean)
+  colnames(fit_eta) = sprintf("trait%s",seq(1:ncol(fit_eta)))
+  fit_lambda = apply(components$lambda,2,mean)
+  fit_Phi = apply(components$Cor_trait,c(2,3),mean)
+  fit_gamma = apply(components$gamma,2,mean)
+  fit_psi = apply(components$psi,2,mean)
+  fit_r = apply(components$r,2,mean)
+  out = list(lambda = fit_lambda,
+             phi = fit_Phi,
+             gamma = fit_gamma,
+             psi = fit_psi,
+             eta = fit_eta,
+             r = fit_r)
+  return(out)
+}
+
+get_prediction_model <- function(fitted_model) {
+  model = rstan::stan_model("~/Documents/thurstonianIRT/src/stan_files/thurstonian_irt_predictor.stan") #stanmodels$thurstonian_irt_predictor
+  fit_params = get_TIRT_params_stan(fitted_model)
+  structure(list(predictor = model,
+              fit_params = fit_params), class="TIRTpredict")
+}
+
+#' @export
+fit_TIRTpredictor_stan <- function(TIRTfit, newdata, init = 0, ...) {
+  TIRTpredict = get_prediction_model(TIRTfit$fit)
+  stan_data = make_stan_data(newdata)
+  # add fit params to data
+  stan_data$lambda = TIRTpredict$fit_params$lambda
+  stan_data$psi = TIRTpredict$fit_params$psi
+  stan_data$gamma = TIRTpredict$fit_params$gamma
+  stan_data$r = TIRTpredict$fit_params$r
+  stan_data$L_trait = t(chol(TIRTpredict$fit_params$phi)) # cholesky decomposition of correlation matrix
+
+  stan_pars = c("eta")
+  fit = rstan::sampling(TIRTpredict$predictor,
+                         data=stan_data,
+                         pars=stan_pars,
+                         init=init,
+                         ...)
+  structure(nlist(fit=fit, data=newdata), class = "TIRTfit")
+}
