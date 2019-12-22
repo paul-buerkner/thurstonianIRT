@@ -4,9 +4,15 @@
 \alias{make_TIRT_data}
 \title{Prepare data for Thurstonian IRT models}
 \usage{
-make_TIRT_data(data, blocks, direction = c("larger", "smaller"),
-  format = c("ranks", "pairwise"), family = "bernoulli",
-  partial = FALSE, range = c(0, 1))
+make_TIRT_data(
+  data,
+  blocks,
+  direction = c("larger", "smaller"),
+  format = c("ranks", "pairwise"),
+  family = "bernoulli",
+  partial = FALSE,
+  range = c(0, 1)
+)
 }
 \arguments{
 \item{data}{An object of class \code{data.frame} containing data of all

@@ -4,9 +4,19 @@
 \alias{sim_TIRT_data}
 \title{Simulate Thurstonian IRT data}
 \usage{
-sim_TIRT_data(npersons, ntraits, lambda, gamma, psi = NULL, Phi = NULL,
-  eta = NULL, family = "bernoulli", nblocks_per_trait = 5,
-  nitems_per_block = 3, comb_blocks = c("random", "fixed"))
+sim_TIRT_data(
+  npersons,
+  ntraits,
+  lambda,
+  gamma,
+  psi = NULL,
+  Phi = NULL,
+  eta = NULL,
+  family = "bernoulli",
+  nblocks_per_trait = 5,
+  nitems_per_block = 3,
+  comb_blocks = c("random", "fixed")
+)
 }
 \arguments{
 \item{npersons}{Number of persons.}

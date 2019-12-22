@@ -4,8 +4,14 @@
 \alias{set_blocks_from_df}
 \title{Prepare blocks of items from a data frame}
 \usage{
-set_blocks_from_df(data, blocks = "block", items = "item",
-  traits = "trait", names = items, signs = "sign")
+set_blocks_from_df(
+  data,
+  blocks = "block",
+  items = "item",
+  traits = "trait",
+  names = items,
+  signs = "sign"
+)
 }
 \arguments{
 \item{blocks}{Name of column vector denoting the block each item
