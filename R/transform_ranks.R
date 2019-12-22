@@ -1,4 +1,5 @@
 # these functions are likely redundant to make_TIRT_data(format = "ranks")
+# see PR #17 for discussion
 
 # compare two values; NA if equal
 greater <- function(x) {
