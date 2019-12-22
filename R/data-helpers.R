@@ -443,3 +443,63 @@ family_options <- function(software = NULL) {
   }
   out
 }
+
+#compares two values, NA if equal.
+
+more <- function(x) {
+  if (x[1] > x[2]) { return(1L)
+  } else if (x[1] < x[2]) {return(0L)
+  } else {return(NA_integer_)}
+}
+
+#creates pairs of comparisons for the block
+
+compare_item_pairs <- function(x) combn(unlist(x), 2, more)
+
+#creates column names for paired comparisons in the block
+
+item_pairs_names <- function(items) {
+  combn(items, 2, collapse)
+}
+
+#convert block of ranks to block of paired comparisons with appropriate column names
+
+compare_ranks_in_block <- function(block_resp){
+  block_dich <- t(apply(block_resp, 1, compare_item_pairs))
+  colnames(block_dich) <- item_pairs_names(names(block_resp))
+  block_dich
+}
+
+#' Transform ranks into comparisons
+#'
+#' Transform dataframe of ranks into dataframe of item comparisons.
+#' The resulted dataframe can be used in function \code{\link{make_TIRT_data}}
+#'
+#' @param data An object of class \code{data.frame} containing
+#' all ranks for every block
+#' @param nitems_in_block An integer indicating number of items inside one block.
+#' This number must be more than 1.
+#'
+#' @examples
+#' #define a ranking data.frame with two rows and two blocks with three items each
+#' ranks = data.frame(i1 = c(1,2), i2 = c(2,3), i3 = c(3,1),
+#'                    i4 = c(3,1), i5 = c(1,3), i6 = c(2,2))
+#'
+#' #generate comparisons data.frame
+#' compare_ranks(data = ranks, nitems_in_block = 3)
+#' @seealso \code{\link{make_TIRT_data}}
+#' @export
+
+compare_ranks <- function(data,
+                          nitems_in_block){
+  nblocks = ncol(data)/nitems_in_block
+  if (nitems_in_block %%1 != 0 | nitems_in_block <= 1){
+    stop("Number of items in a block must be integer and more than 1")
+  }
+  if (nblocks %%1 != 0){
+    stop("Number of columns in ranking data must be dividable by nitems_in_block")
+  }
+  splitted <- split.default(data, rep(1:nblocks, rep(nitems_in_block,nblocks)))
+  splitted_dich <- lapply(splitted, compare_ranks_in_block)
+  do.call(cbind, splitted_dich)
+}
