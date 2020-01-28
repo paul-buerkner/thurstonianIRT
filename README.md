@@ -1,6 +1,7 @@
 thurstonianIRT
 ==============
 
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.01662/status.svg)](https://doi.org/10.21105/joss.01662)
 [![Build
 Status](https://travis-ci.org/paul-buerkner/thurstonianIRT.svg?branch=master)](https://travis-ci.org/paul-buerkner/thurstonianIRT)
 [![CRAN
