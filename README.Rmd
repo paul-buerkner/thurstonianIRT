@@ -32,21 +32,22 @@ set.seed(1234)
 
 ## Overview 
 
-The **thurstonianIRT** package allows to fit various models from Item Response
-Theory (IRT) for forced-choice questionnaires, most notably the Thurstonian IRT
-model originally proposed by (Brown & Maydeu-Olivares, 2011). IRT in general
-comes with several advantages over classical test theory, for instance, the
-ability to model varying item difficulties as well as item factor loadings on
-the participants' traits they are supposed to measure. Moreover, if multiple
-traits are modeled at the same time, their correlation can be incorporated into
-an IRT model to improve the overall estimation accuracy. The key characteristic
-of forced-choice questionnaires is that participants cannot endorse all items at
+The **thurstonianIRT** package allows to fit various models from [Item Response
+Theory (IRT)](https://en.wikipedia.org/wiki/Item_response_theory) for
+forced-choice questionnaires, most notably the Thurstonian IRT model originally
+proposed by (Brown & Maydeu-Olivares, 2011). IRT in general comes with several
+advantages over classical test theory, for instance, the ability to model
+varying item difficulties as well as item factor loadings on the participants'
+traits they are supposed to measure. Moreover, if multiple traits are modeled
+at the same time, their correlation can be incorporated into an IRT model to
+improve the overall estimation accuracy. The key characteristic of
+forced-choice questionnaires is that participants cannot endorse all items at
 the same time and instead have to make a comparative judgment between two or
 more items. Such a format comes with the hope of providing more valid inference
-in situation where participants have motivation to not answer honestly (e.g., in
-personnel selection), but instead respond in a way that appears favorable in the
-given situation. Whether forced-choice questionnaires and the corresponding IRT
-models live up to this hope remains a topic of debate (e.g., see Bürkner,
+in situation where participants have motivation to not answer honestly (e.g.,
+in personnel selection), but instead respond in a way that appears favorable in
+the given situation. Whether forced-choice questionnaires and the corresponding
+IRT models live up to this hope remains a topic of debate (e.g., see Bürkner,
 Schulte, & Holling, 2019) but it is in any case necessary to provide software
 for fitting these statistical models both for practical and research purposes.
 
