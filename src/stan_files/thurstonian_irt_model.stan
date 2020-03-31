@@ -127,9 +127,9 @@ model {
   } else if (family == 3) {
     // gaussian models
     for (n in 1:N) {
-      mu[n] = (mu[n] - gamma[J_itemC[n]]) / sum_psi[n];
+      mu[n] = mu[n] - gamma[J_itemC[n]];
     }
-    Yreal ~ normal(mu, 1);
+    Yreal ~ normal(mu, sum_psi);
   } else if (family == 4) {
     // beta models
     for (n in 1:N) {

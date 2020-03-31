@@ -4,6 +4,8 @@
 
 * Fix usage of `gamma` parameters in `sim_TIRT_data`
 thanks to @IanEisenberg. (#13)
+* Prevent impossible rankings from being sampled in 
+`sim_TIRT_data` thanks to Susanne Frick.
 
 ## New Features
 
