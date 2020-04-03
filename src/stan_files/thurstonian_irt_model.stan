@@ -85,7 +85,7 @@ transformed parameters {
   matrix[N_person, N_trait] eta;
   vector[N_item] lambda;  // item loadings
   vector<lower=0>[N_item] psi;  // item SDs
-  vector[N_item] r;  // item random effects
+  vector[N_item] r;  // item random effects (residuals)
   eta = (L_trait * z_trait)';
   psi[J_item_fix] = psi_fix;
   psi[J_item_est] = psi_est;
@@ -129,7 +129,8 @@ model {
     for (n in 1:N) {
       mu[n] = mu[n] - gamma[J_itemC[n]];
     }
-    Yreal ~ normal(mu, sum_psi);
+    # SD = 1 is arbitrary as the residuals r are already part of mu
+    Yreal ~ normal(mu, 1);
   } else if (family == 4) {
     // beta models
     for (n in 1:N) {
