@@ -2,7 +2,7 @@ Package: thurstonianIRT
 Encoding: UTF-8
 Type: Package
 Title: Thurstonian IRT Models
-Version: 0.10.2
+Version: 0.11.0
 Date: 2020-07-16
 Authors@R: c(person("Paul-Christian", "Bürkner", 
                     email = "paul.buerkner@gmail.com",
@@ -12,7 +12,8 @@ Authors@R: c(person("Paul-Christian", "Bürkner",
 Description: Fit Thurstonian Item Response Theory (IRT) models in R. This 
   package supports fitting Thurstonian IRT models and its extensions using 
   'Stan', 'lavaan', or 'Mplus' for the model estimation. Functionality for 
-  extracting results and simulating data is provided as well. References: 
+  extracting results, making predictions, and simulating data is provided as 
+  well. References: 
   Brown & Maydeu-Olivares (2011) <doi:10.1177/0013164410375112>;
   Bürkner et al. (2019) <doi:10.1177/0013164419832063>.
 License: GPL (>=3)
