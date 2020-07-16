@@ -129,7 +129,7 @@ model {
     for (n in 1:N) {
       mu[n] = mu[n] - gamma[J_itemC[n]];
     }
-    # SD = 1 is arbitrary as the residuals r are already part of mu
+    // SD = 1 is arbitrary as the residuals r are already part of mu
     Yreal ~ normal(mu, 1);
   } else if (family == 4) {
     // beta models
