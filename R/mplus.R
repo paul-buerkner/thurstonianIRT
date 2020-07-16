@@ -309,7 +309,7 @@ fit_TIRT_mplus <- function(data, ...) {
   fit$results$trait_scores <- trait_scores
   fit$results$trait_scores_se <- trait_scores_se
   class(fit) <- c("mplusObjectTIRT", class(fit))
-  structure(nlist(fit, data), class = "TIRTfit")
+  TIRTfit(fit, data)
 }
 
 is.mplusObjectTIRT <- function(x) {
@@ -328,4 +328,39 @@ print.mplusObjectTIRT <- function(x, digits = 2, ...) {
 #' @export
 summary.mplusObjectTIRT <- function(object, ...) {
   object$results$parameters$unstandardized
+}
+
+# predict trait scores using Mplus
+predict_mplus <- function(object, newdata = NULL, ...) {
+  if (!is.null(newdata)) {
+    stop("'newdata' is not supported for models fit with Mplus.")
+  }
+  fit <- object$fit
+  traits <- attributes(object$data)$traits
+  out <- fit$results[["trait_scores"]]
+  if (is.null(out)) {
+    # for backwards compatibility with version < 0.9.3
+    out <- fit$results[["savedata"]]
+  }
+  out <- as.data.frame(out)
+  if (NROW(out)) {
+    ntraits <- ncol(out)
+    out <- out %>%
+      tidyr::gather("trait", "estimate", everything()) %>%
+      mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
+      arrange(.data$id) %>%
+      select("id", "trait", "estimate")
+  }
+  se <- as.data.frame(fit$results[["trait_scores_se"]])
+  if (NROW(se)) {
+    ntraits <- ncol(se)
+    se <- se %>%
+      tidyr::gather("trait", "se", everything()) %>%
+      mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
+      arrange(.data$id) %>%
+      select("id", "trait", "se")
+  }
+  out %>%
+    inner_join(se, by = c("id", "trait")) %>%
+    as_tibble()
 }

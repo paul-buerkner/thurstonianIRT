@@ -243,5 +243,25 @@ fit_TIRT_lavaan <- function(data, estimator = "ULSMV", ...) {
     parameterization = "theta", estimator = estimator,
     ...
   )
-  structure(nlist(fit, data), class = "TIRTfit")
+  TIRTfit(fit, data)
+}
+
+# predict trait scores using lavaan
+predict_lavaan <- function(object, newdata = NULL, ...) {
+  if (!is.null(newdata)) {
+    # TODO: check 'newdata' for validity
+    newdata <- make_sem_data(newdata)
+  }
+  fit <- object$fit
+  traits <- attributes(object$data)$traits
+  out <- as.data.frame(lavaan::lavPredict(fit, newdata = newdata, ...))
+  if (NROW(out)) {
+    ntraits <- ncol(out)
+    out <- out %>%
+      tidyr::gather("trait", "estimate", everything()) %>%
+      mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
+      arrange(.data$id) %>%
+      select("id", "trait", "estimate")
+  }
+  as_tibble(out)
 }

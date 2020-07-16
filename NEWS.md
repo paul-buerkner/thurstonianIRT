@@ -9,6 +9,7 @@ thanks to @IanEisenberg. (#13)
 
 ## New Features
 
+* Support predictions of trait scores for new persons. (#12)
 * Specify multiple blocks at once via `set_blocks_from_df`
 thanks to @awhug. (#11)
 
