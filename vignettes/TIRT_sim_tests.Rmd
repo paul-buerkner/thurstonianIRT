@@ -154,7 +154,7 @@ res
 ```
 
 ```{r, include = FALSE}
-testthat::expect_true(all(res$rel > 0.84))
+testthat::expect_true(all(res$rel > 0.80))
 ```
 
 Lastly, we can also compute and investigate the trait correlations between
