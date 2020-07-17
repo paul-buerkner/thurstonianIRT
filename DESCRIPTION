@@ -39,6 +39,7 @@ Imports:
     knitr
 Suggests:
     testthat (>= 0.9.1),
+    markdown
 LinkingTo: 
     StanHeaders (>= 2.17.2), 
     rstan (>= 2.17.3), 

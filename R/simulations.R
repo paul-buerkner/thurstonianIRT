@@ -49,7 +49,7 @@
 #' print(fit)
 #' }
 #'
-#' @importFrom stats sd setNames
+#' @importFrom stats sd setNames rnorm rbeta
 #' @importFrom rlang .data
 #' @export
 sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
@@ -226,7 +226,7 @@ add_response <- function(data, family) {
     # mean parameterization of the beta distribution
     # do not use 'error' but sample directly from the latent distribution
     pr <- stats::pnorm(data$mu / sum_psi)
-    data$response <- stats::rbeta(length(pr), pr * disp, (1 - pr) * disp)
+    data$response <- rbeta(length(pr), pr * data$disp, (1 - pr) * data$disp)
     # truncate distribution at the extremes
     data$response[data$response < 0.001] <- 0.001
     data$response[data$response > 0.999] <- 0.999

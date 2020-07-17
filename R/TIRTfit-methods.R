@@ -27,6 +27,7 @@ summary.TIRTfit <- function(object, ...) {
 #'   for which trait scores should be predicted based on the fitted
 #'   model. If \code{NULL} (the default), trait scores are predicted
 #'   for the persons whose data was used to originally fit the model.
+#' @param ... Further arguments passed to the underlying methods.
 #'
 #' @details When predicting trait scores of new persons (via \code{newdata}),
 #'   posterior medians of item parameters are used for predictions. This implies

@@ -204,7 +204,7 @@ predict_stan_new_data <- function(object, newdata, inits = 0, ...) {
   for (par in pars) {
     if (prod(par_dims[[par]]) > 0) {
       samples <- as.matrix(object$fit, par)
-      stan_data_pars[[par]] <- apply(samples, 2, median)
+      stan_data_pars[[par]] <- apply(samples, 2, stats::median)
     } else {
       stan_data_pars[[par]] <- numeric(0)
     }

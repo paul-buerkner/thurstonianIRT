@@ -14,6 +14,8 @@
 for which trait scores should be predicted based on the fitted
 model. If \code{NULL} (the default), trait scores are predicted
 for the persons whose data was used to originally fit the model.}
+
+\item{...}{Further arguments passed to the underlying methods.}
 }
 \value{
 A data frame with predicted trait scores.

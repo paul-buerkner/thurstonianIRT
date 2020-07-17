@@ -14,6 +14,9 @@ set_blocks_from_df(
 )
 }
 \arguments{
+\item{data}{A \code{data.frame} containing all the required columns
+(see the arguments below) to specify the item blocks.}
+
 \item{blocks}{Name of column vector denoting the block each item
 corresponds to. Each block must have an equal number of items.}
 
