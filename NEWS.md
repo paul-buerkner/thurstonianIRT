@@ -1,3 +1,8 @@
+# thurstonianIRT 0.11.1
+
+* Fix tests failing after an update of `lavaan`. (#25)
+
+
 # thurstonianIRT 0.11.0
 
 ## Bug Fixes
