@@ -276,7 +276,7 @@ make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
         valid <- max(nbpt_chosen) <= min(nbpt_chosen) + 1 &&
           !any(nbpt_chosen[traits_chosen] > nblocks_per_trait)
         if (valid) {
-          possible_rows <- possible_rows[-chosen[i]]
+          possible_rows <- setdiff(possible_rows, chosen[i])
           i <- i + 1
         } else {
           # revert number of blocks per trait chosen
