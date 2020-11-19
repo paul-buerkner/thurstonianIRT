@@ -256,14 +256,19 @@ make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
       }
     }
     out <- out[!remove, ]
-    possible_rows <- seq_len(nrow(out))
+    all_rows <- seq_len(nrow(out))
     nbpt_chosen <- rep(0, ntraits)
 
-    .choose <- function(nblocks, maxtrys) {
+    .choose <- function(nblocks, maxtrys, all_rows) {
       # finds suitable blocks
       chosen <- rep(NA, nblocks)
+      possible_rows <- all_rows
       i <- ntrys <- 1
       while (i <= nblocks && ntrys <= maxtrys) {
+        if (!length(possible_rows)) {
+          # all rows were selected already; start fresh
+          possible_rows <- all_rows
+        }
         ntrys <- ntrys + 1
         chosen[i] <- possible_rows[sample(seq_along(possible_rows), 1)]
         traits_chosen <- out[chosen[i], ]
@@ -285,7 +290,8 @@ make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
     chosen <- rep(NA, nblocks)
     while (anyNA(chosen) && i <= maxtrys_outer) {
       i <- i + 1
-      chosen <- .choose(nblocks, maxtrys = maxtrys_inner)
+      chosen <- .choose(nblocks, maxtrys = maxtrys_inner,
+                        all_rows = all_rows)
     }
     if (anyNA(chosen)) {
       stop("Could not find a set of suitable blocks.")

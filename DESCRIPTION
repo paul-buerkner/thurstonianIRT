@@ -2,8 +2,8 @@ Package: thurstonianIRT
 Encoding: UTF-8
 Type: Package
 Title: Thurstonian IRT Models
-Version: 0.11.1
-Date: 2020-08-03
+Version: 0.11.2
+Date: 2020-11-19
 Authors@R: c(person("Paul-Christian", "Bürkner", 
                     email = "paul.buerkner@gmail.com",
                     role = c("aut", "cre")),
