@@ -236,7 +236,7 @@ add_response <- function(data, family) {
 
 make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
                              comb_blocks = c("fixed", "random"),
-                             maxtrys_outer = 20, maxtrys_inner = 1e6) {
+                             maxtrys_outer = 100, maxtrys_inner = 1e6) {
   comb_blocks <- match.arg(comb_blocks)
   stopifnot((ntraits * nblocks_per_trait) %% nitems_per_block == 0L)
   if (comb_blocks == "fixed") {
@@ -275,11 +275,12 @@ make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
         nbpt_chosen[traits_chosen] <- nbpt_chosen[traits_chosen] + 1
         valid <- max(nbpt_chosen) <= min(nbpt_chosen) + 1 &&
           !any(nbpt_chosen[traits_chosen] > nblocks_per_trait)
+        possible_rows <- setdiff(possible_rows, chosen[i])
         if (valid) {
-          possible_rows <- setdiff(possible_rows, chosen[i])
           i <- i + 1
         } else {
           # revert number of blocks per trait chosen
+          # and try finding traits for block i again
           nbpt_chosen[traits_chosen] <- nbpt_chosen[traits_chosen] - 1
         }
       }
