@@ -6,6 +6,54 @@ RMSE <- function(x, y) {
   sqrt(colMeans((x - y)^2))
 }
 
+#' Extract corrected goodness of fit statistics
+#'
+#' By default \code{lavaan} will return a value for degrees of
+#' freedom that ignores redundancies amongst the estimated model
+#' thresholds. This function corrects the degrees of freedom, and
+#' then recalculates the associated chi-square test statistic
+#' p-value and root mean square error of approximation (RMSEA).
+#'
+#' Note this function is currently only implemented for \code{lavaan}.
+#'
+#' @param TIRTfit a TIRTfit object
+#'
+#' @return A vector containing the chi-square value, adjusted degrees of freedom, p-value, and RMSEA.
+#'
+#' @examples
+#' gof_TIRT(fit)
+#'
+#' @export
+gof_TIRT <- function(TIRTfit){
+  # Stop conditions: Must be TIRTfit obj & fitted in lavaan
+  if(inherits(TIRTfit, "TIRTfit") == FALSE){
+    stop("The first argument must be a lavaan-fitted TIRT model.")}
+  if(inherits(TIRTfit$fit, "lavaan") == FALSE){
+    stop("gof_TIRT currently only works for lavaan fitted TIRT models.")}
+
+  # Extract chi_sq, N, and unadjusted DF
+  chi_sq <- TIRTfit$fit@test$scaled.shifted$stat
+  N <- length(unique(TIRTfit$data$person))
+  df <- TIRTfit$fit@test$scaled.shifted$df
+
+  # Get number of items per block to calculate redundancies
+  block_no <- unique(TIRTfit$data$block)
+  redundancies <- vector()
+  for(y in seq(block_no)){
+    n_items <- nrow(unique(subset(TIRTfit$data, block == y, select = itemC)))
+    redundancies[y] <- n_items * (n_items - 1) * (n_items - 2) / 6
+  }
+
+  # Adjust the DF, p-value, and recalculate the RMSEA
+  df <- df - sum(redundancies)
+  p_val <- 1 - pchisq(chi_sq, df)
+  ifelse(df > chi_sq,
+         RMSEA <- 0,
+         RMSEA <- sqrt((chi_sq - df)/(df * (N - 1))) )
+  gof <- c(Chi_Sq = chi_sq, df = df, p_val = p_val, RMSEA = RMSEA)
+  return(gof)
+}
+
 scale2 <- function(x, center = FALSE) {
   if (center) {
     means <- colMeans(x)
