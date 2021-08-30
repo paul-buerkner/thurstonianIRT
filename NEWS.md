@@ -1,3 +1,8 @@
+# thurstonianIRT 0.12.0
+
+* Switch to the latest `rstantools` toolchain.
+
+
 # thurstonianIRT 0.11.1
 
 * Fix tests failing after an update of `lavaan`. (#25)

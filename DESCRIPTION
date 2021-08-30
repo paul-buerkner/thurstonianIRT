@@ -2,8 +2,8 @@ Package: thurstonianIRT
 Encoding: UTF-8
 Type: Package
 Title: Thurstonian IRT Models
-Version: 0.11.2
-Date: 2020-11-19
+Version: 0.12.0
+Date: 2021-08-30
 Authors@R: c(person("Paul-Christian", "Bürkner", 
                     email = "paul.buerkner@gmail.com",
                     role = c("aut", "cre")),
@@ -24,33 +24,35 @@ Depends:
     Rcpp (>= 0.12.16), 
     methods
 Imports: 
-    rstan (>= 2.17.3), 
-    rstantools (>= 1.5.0),
-    lavaan (>= 0.6-1),
-    MplusAutomation,
     dplyr (>= 0.6.0),
+    knitr,
+    lavaan (>= 0.6-1),
+    magrittr,
+    MplusAutomation,
+    mvtnorm,
+    RcppParallel (>= 5.0.1),
+    rlang,
+    rstan (>= 2.18.1),
+    rstantools (>= 2.1.1),
+    stats,
     tibble (>= 1.3.1),
     tidyr,
-    magrittr,
-    mvtnorm,
-    utils,
-    stats,
-    rlang,
-    knitr
+    utils
 Suggests:
     testthat (>= 0.9.1),
     markdown
 LinkingTo: 
-    StanHeaders (>= 2.17.2), 
-    rstan (>= 2.17.3), 
-    BH (>= 1.66.0-1), 
-    Rcpp (>= 0.12.16), 
-    RcppEigen (>= 0.3.3.4.0)
+    BH (>= 1.66.0-1),
+    Rcpp (>= 0.12.16),
+    RcppEigen (>= 0.3.3.4.0),
+    RcppParallel (>= 5.0.1),
+    rstan (>= 2.18.1),
+    StanHeaders (>= 2.18.0)
 VignetteBuilder: 
     knitr
-SystemRequirements: 
-    GNU make
+SystemRequirements: GNU make
 URL: https://github.com/paul-buerkner/thurstonianIRT
 BugReports: https://github.com/paul-buerkner/thurstonianIRT/issues
 NeedsCompilation: yes
 RoxygenNote: 7.1.1
+Biarch: true
