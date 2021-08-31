@@ -7,6 +7,7 @@ Date: 2021-08-30
 Authors@R: c(person("Paul-Christian", "Bürkner", 
                     email = "paul.buerkner@gmail.com",
                     role = c("aut", "cre")),
+             person("Angus", Hughes", role = c("ctb")),
              person("Trustees of Columbia University", 
                     role = "cph"))
 Description: Fit Thurstonian Item Response Theory (IRT) models in R. This 
