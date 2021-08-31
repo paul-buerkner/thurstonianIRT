@@ -1,14 +1,28 @@
-# thurstonianIRT 0.10.0++
+# thurstonianIRT 0.12.0
+
+* Switch to the latest `rstantools` toolchain.
+
+
+# thurstonianIRT 0.11.1
+
+* Fix tests failing after an update of `lavaan`. (#25)
+
+
+# thurstonianIRT 0.11.0
 
 ## Bug Fixes
 
 * Fix usage of `gamma` parameters in `sim_TIRT_data`
 thanks to @IanEisenberg. (#13)
+* Prevent impossible rankings from being sampled in 
+`sim_TIRT_data` thanks to Susanne Frick.
 
 ## New Features
 
+* Support predictions of trait scores for new persons. (#12, #15)
 * Specify multiple blocks at once via `set_blocks_from_df`
 thanks to @awhug. (#11)
+
 
 # thurstonianIRT 0.10.0
 

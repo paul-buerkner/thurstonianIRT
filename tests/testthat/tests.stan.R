@@ -18,6 +18,12 @@ test_that("Stan code for bernoulli responses works", {
   pr_names <- c("id", "trait", "estimate", "se", "lower_ci", "upper_ci")
   expect_equal(names(pr), pr_names)
   expect_equal(length(unique(pr$id)), 10)
+
+  # test predictions for new data
+  new_sdata <- dplyr::filter(sdata, person %in% 1:5)
+  pr_new <- predict(fit, new_sdata, chains = 1, iter = 500)
+  expect_equal(names(pr_new), pr_names)
+  expect_equal(length(unique(pr_new$id)), 5)
 })
 
 test_that("Stan code for ordinal responses works", {
@@ -45,6 +51,12 @@ test_that("Stan code for ordinal responses works", {
   pr_names <- c("id", "trait", "estimate", "se", "lower_ci", "upper_ci")
   expect_equal(names(pr), pr_names)
   expect_equal(length(unique(pr$id)), 10)
+
+  # test predictions for new data
+  new_sdata <- dplyr::filter(sdata, person %in% 1:5)
+  pr_new <- predict(fit, new_sdata, chains = 1, iter = 500)
+  expect_equal(names(pr_new), pr_names)
+  expect_equal(length(unique(pr_new$id)), 5)
 })
 
 test_that("Stan code for gaussian responses works", {
@@ -65,4 +77,10 @@ test_that("Stan code for gaussian responses works", {
   pr_names <- c("id", "trait", "estimate", "se", "lower_ci", "upper_ci")
   expect_equal(names(pr), pr_names)
   expect_equal(length(unique(pr$id)), 10)
+
+  # test predictions for new data
+  new_sdata <- dplyr::filter(sdata, person %in% 1:5)
+  pr_new <- predict(fit, new_sdata, chains = 1, iter = 500)
+  expect_equal(names(pr_new), pr_names)
+  expect_equal(length(unique(pr_new$id)), 5)
 })

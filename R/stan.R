@@ -141,7 +141,7 @@ make_stan_data <- function(data) {
 #' @export
 fit_TIRT_stan <- function(data, init = 0, ...) {
   stan_data <- make_stan_data(data)
-  stan_pars = c(
+  stan_pars <- c(
     "Cor_trait", "lambda", "psi", "gamma",
     "gamma_ord", "disp", "r", "eta"
   )
@@ -150,6 +150,76 @@ fit_TIRT_stan <- function(data, init = 0, ...) {
     data = stan_data, pars = stan_pars,
     init = init, ...
   )
-  structure(nlist(fit, data), class = "TIRTfit")
+  TIRTfit(fit, data)
 }
 
+# predict trait scores using Stan
+predict_stan <- function(object, newdata = NULL, ...) {
+  if (is.null(newdata)) {
+    out <- predict_stan_old_data(object, ...)
+  } else {
+    out <- predict_stan_new_data(object, newdata, ...)
+  }
+  out
+}
+
+# predict trait scores of existing persons using Stan
+predict_stan_old_data <- function(object, ...) {
+  fit <- object$fit
+  traits <- attributes(object$data)$traits
+  out <- as.data.frame(summary(fit, "eta")$summary)
+  if (NROW(out)) {
+    out <- out %>%
+      tibble::rownames_to_column(var = "par") %>%
+      rename(
+        estimate = "mean", se = "sd",
+        lower_ci = "2.5%", upper_ci = "97.5%"
+      ) %>%
+      select("par", "estimate", "se", "lower_ci", "upper_ci") %>%
+      tidyr::extract(
+        col = "par", into = c("par", "id", "trait"),
+        regex = "(eta)\\[([[:digit:]]+),([[:digit:]]+)\\]"
+      ) %>%
+      mutate(
+        id = as.integer(.data$id),
+        trait = as.integer(.data$trait)
+      ) %>%
+      select(-.data$par) %>%
+      mutate(trait = as.character(factor(.data$trait, labels = traits))) %>%
+      arrange(.data$id)
+  }
+  as_tibble(out)
+}
+
+# predict trait scores of new persons using Stan
+predict_stan_new_data <- function(object, newdata, inits = 0, ...) {
+  # TODO: check 'newdata' for validity
+  stan_data <- make_stan_data(newdata)
+
+  # extract (medians of) item parameters and person hyperparameters
+  # to be used as data in the predictions for new data
+  par_dims <- object$fit@par_dims
+  pars <- c("Cor_trait", "lambda", "psi", "r", "gamma", "gamma_ord", "disp")
+  stan_data_pars <- named_list(pars)
+  for (par in pars) {
+    if (prod(par_dims[[par]]) > 0) {
+      samples <- as.matrix(object$fit, par)
+      stan_data_pars[[par]] <- apply(samples, 2, stats::median)
+    } else {
+      stan_data_pars[[par]] <- numeric(0)
+    }
+    dim(stan_data_pars[[par]]) <- par_dims[[par]]
+  }
+  # TODO: is there a more consistent approach to extract
+  # the median cholesky factor of the trait correlation matrix?
+  stan_data_pars$L_trait <- t(chol(stan_data_pars$Cor_trait))
+  stan_data <- c(stan_data, stan_data_pars)
+
+  # fit the model to obtain predictions for new persons
+  fit <- rstan::sampling(
+    stanmodels$thurstonian_irt_model_newdata,
+    data = stan_data, pars = "eta",
+    init = inits, ...
+  )
+  predict_stan_old_data(TIRTfit(fit, newdata), ...)
+}

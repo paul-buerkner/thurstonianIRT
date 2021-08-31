@@ -333,6 +333,8 @@ empty_block <- function() {
 #' in a forced choice format. A whole test usually contains
 #' several blocks and items may reappear in different blocks.
 #'
+#' @param data A \code{data.frame} containing all the required columns
+#' (see the arguments below) to specify the item blocks.
 #' @param blocks Name of column vector denoting the block each item
 #' corresponds to. Each block must have an equal number of items.
 #' @param items Name of column vector denoting items to be combined into

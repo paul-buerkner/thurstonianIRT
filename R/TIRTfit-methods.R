@@ -19,74 +19,33 @@ summary.TIRTfit <- function(object, ...) {
   summary(object$fit, ...)
 }
 
+#' Predict trait scores of Thurstonian IRT models
+#'
+#' @param object An object of class \code{TIRTfit}.
+#' @param newdata Optional \code{TIRTdata} object (created via
+#'   \code{\link{make_TIRT_data}}) containing data of new persons
+#'   for which trait scores should be predicted based on the fitted
+#'   model. If \code{NULL} (the default), trait scores are predicted
+#'   for the persons whose data was used to originally fit the model.
+#' @param ... Further arguments passed to the underlying methods.
+#'
+#' @details When predicting trait scores of new persons (via \code{newdata}),
+#'   posterior medians of item parameters are used for predictions. This implies
+#'   that the uncertainty in the new trait scores is underestimated as the
+#'   uncertainty in the (posterior distribution of) item parameters is ignored.
+#'
+#' @return A data frame with predicted trait scores.
+#'
 #' @export
-predict.TIRTfit <- function(object, ...) {
-  fit <- object$fit
-  traits <- attributes(object$data)$traits
-  if (inherits(fit, "stanfit")) {
-    # post process Stan objects
-    out <- as.data.frame(summary(fit, "eta")$summary)
-    if (NROW(out)) {
-      out <- out %>%
-        tibble::rownames_to_column(var = "par") %>%
-        rename(
-          estimate = "mean", se = "sd",
-          lower_ci = "2.5%", upper_ci = "97.5%"
-        ) %>%
-        select("par", "estimate", "se", "lower_ci", "upper_ci") %>%
-        tidyr::extract(
-          col = "par", into = c("par", "id", "trait"),
-          regex = "(eta)\\[([[:digit:]]+),([[:digit:]]+)\\]"
-        ) %>%
-        mutate(
-          id = as.integer(.data$id),
-          trait = as.integer(.data$trait)
-        ) %>%
-        select(-.data$par) %>%
-        mutate(trait = as.character(factor(.data$trait, labels = traits))) %>%
-        arrange(.data$id)
-    }
-  } else {
-    # post process Mplus objects
-    if (inherits(fit, "mplusObjectTIRT")) {
-      out <- fit$results[["trait_scores"]]
-      if (is.null(out)) {
-        # for backwards compatibility with version < 0.9.3
-        out <- fit$results[["savedata"]]
-      }
-      out <- as.data.frame(out)
-      if (NROW(out)) {
-        ntraits <- ncol(out)
-        out <- out %>%
-          tidyr::gather("trait", "estimate", everything()) %>%
-          mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
-          arrange(.data$id) %>%
-          select("id", "trait", "estimate")
-      }
-      se <- as.data.frame(fit$results[["trait_scores_se"]])
-      if (NROW(se)) {
-        ntraits <- ncol(se)
-        se <- se %>%
-          tidyr::gather("trait", "se", everything()) %>%
-          mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
-          arrange(.data$id) %>%
-          select("id", "trait", "se")
-      }
-      out <- out %>% inner_join(se, by = c("id", "trait"))
-    } else if (inherits(fit, "lavaan")) {
-      # post process lavaan objects
-      out <- as.data.frame(lavaan::lavPredict(fit, ...))
-      if (NROW(out)) {
-        ntraits <- ncol(out)
-        out <- out %>%
-          tidyr::gather("trait", "estimate", everything()) %>%
-          mutate(id = rep(seq_len(n() / ntraits), ntraits)) %>%
-          arrange(.data$id) %>%
-          select("id", "trait", "estimate")
-      }
-    }
+predict.TIRTfit <- function(object, newdata = NULL, ...) {
+  if (inherits(object$fit, "stanfit")) {
+    out <- predict_stan(object, newdata = newdata, ...)
+  } else if (inherits(object$fit, "mplusObjectTIRT")) {
+    out <- predict_mplus(object, newdata = newdata, ...)
+  } else if (inherits(object$fit, "lavaan")) {
+    out <- predict_lavaan(object, newdata = newdata, ...)
   }
-  as_tibble(out)
+  out
 }
 
 #' Extract corrected goodness of fit statistics

@@ -5,7 +5,10 @@ src-x64/
 src-i386/
 src/init.o
 src/thurstonianIRT.dll
-src/stan_files/thurstonian_irt_model.o
+src/stanExports_thurstonian_irt_model.o
+src/stanExports_thurstonian_irt_model.hpp
+src/stanExports_thurstonian_irt_model_newdata.o
+src/stanExports_thurstonian_irt_model_newdata.hpp
 CRAN-release
 cran-comments.md
 paper/paper.html

@@ -49,7 +49,7 @@
 #' print(fit)
 #' }
 #'
-#' @importFrom stats sd setNames
+#' @importFrom stats sd setNames rnorm rbeta
 #' @importFrom rlang .data
 #' @export
 sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
@@ -82,7 +82,7 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
     traits <- trait_combs[i, ]
     trait1 <- rep_comp(traits, 1, nitems_per_block)
     trait2 <- rep_comp(traits, 2, nitems_per_block)
-    fblock <- (i - 1) * nitems_per_block
+    fblock <- (i - 1) * ncomparisons
     item1 <- match(trait1, traits) + fblock
     item2 <- match(trait2, traits) + fblock
     sign1 <- sign(lambda[item1])
@@ -119,7 +119,7 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
     lambda <- rep(lambda, nitems)
   }
   if (is.null(psi)) {
-    message("Computing standardized psi as 1 - lambda^2")
+    message("Computing standardized psi^2 as 1 - lambda^2")
     psi <- lambda2psi(lambda)
   } else if (!is.list(psi) && length(psi) == 1L) {
     psi <- rep(psi, nitems)
@@ -168,10 +168,14 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
     pdat <- data[take, ]
     data[take, "eta1"] <- eta[p, pdat$trait1]
     data[take, "eta2"] <- eta[p, pdat$trait2]
+    # sample errors to make them item-person specific
+    # but constant for each item per person
+    errors <- rnorm(nitems, 0, psi)
+    data[take, "error1"] <- errors[pdat$item1]
+    data[take, "error2"] <- errors[pdat$item2]
   }
 
-  data$mu <- mean_response(data, family = family)
-  data$response <- sim_response(data$mu, family = family)
+  data <- add_response(data, family = family)
   structure(data,
     npersons = npersons, ntraits = ntraits, nblocks = nblocks,
     nitems = nitems, nblocks_per_trait = nblocks_per_trait,
@@ -188,65 +192,51 @@ sim_eta <- function(npersons, Phi) {
   mvtnorm::rmvnorm(npersons, mu, Phi)
 }
 
-sim_response <- function(mu, family = "bernoulli", disp = 20) {
-  # Args:
-  #   mu: vector or matrix of means / category probabilities
-  #   disp: dispersion parameter for beta models
-  stopifnot(NCOL(mu) > 0L)
-  if (NCOL(mu) == 1L) {
-    stopifnot(family %in% c("bernoulli", "beta", "gaussian"))
-    if (family == "bernoulli") {
-      out <- stats::rbinom(length(mu), size = 1, prob = mu)
-    } else if (family == "beta") {
-      # mean parameterization of the beta distribution
-      out <- stats::rbeta(length(mu), mu * disp, (1 - mu) * disp)
-      # truncate distribution at the extremes
-      out[out < 0.001] <- 0.001
-      out[out > 0.999] <- 0.999
-    } else if (family == "gaussian") {
-      out <- stats::rnorm(length(mu), mu)
-    }
-  } else {
-    stopifnot(family %in% "cumulative")
-    cats <- seq_len(NCOL(mu)) - 1
-    out <- apply(mu, 1, function(p) sample(cats, 1, prob = p))
+add_response <- function(data, family) {
+  # add columns related to the response
+  # compute the latent mean 'mu'
+  if (family %in% c("bernoulli", "gaussian", "beta")) {
+    data$mu <- with(data, -gamma + lambda1 * eta1 - lambda2 * eta2)
+  } else if (family %in% "cumulative") {
+    # do not include 'gamma' here as it serves as the thresholds
+    data$mu <- with(data, lambda1 * eta1 - lambda2 * eta2)
   }
-  out
-}
 
-#' @importFrom stats pnorm
-mean_response <- function(data, family) {
-  # compute category probabilities
-  ncat <- NCOL(data$gamma) + 1
-  stopifnot(ncat > 1L)
-  if (ncat == 2L) {
-    stopifnot(family %in% c("bernoulli", "beta", "gaussian"))
-    out <- with(data,
-      (-gamma + lambda1 * eta1 - lambda2 * eta2) /
-        sqrt(psi1^2 + psi2^2)
-    )
-    if (family %in% c("bernoulli", "beta")) {
-      out <- pnorm(out)
+  # deterministically include error sampled earlier
+  mu_error <- with(data, mu + error1 - error2)
+  data$error1 <- data$error2 <- NULL
+  sum_psi <- with(data, sqrt(psi1^2 + psi2^2))
+
+  # compute the actual response values
+  if (family == "bernoulli") {
+    data$response <- as.integer(mu_error >= 0)
+  } else if (family == "cumulative") {
+    data$response <- rep(NA, nrow(data))
+    thres <- cbind(-Inf, data$gamma, Inf)
+    for (i in seq_len(nrow(data))) {
+      # 'cut' is not vectorized over 'breaks'
+      data$response[i] <- cut(mu_error[i], breaks = thres[i, ])
     }
-  } else {
-    stopifnot(family %in% "cumulative")
-    sum_psi <- with(data, sqrt(psi1^2 + psi2^2))
-    mu <- with(data, lambda1 * eta1 - lambda2 * eta2) / sum_psi
-    out <- matrix(ncol = ncat, nrow = length(mu))
-    std_gamma <- data$gamma / sum_psi
-    out[, 1] <- pnorm(std_gamma[, 1] - mu)
-    out[, ncat] <- 1 - pnorm(std_gamma[, ncat - 1] - mu)
-    for (i in seq_len(ncat)[-c(1, ncat)]) {
-      out[, i] <- pnorm(std_gamma[, i] - mu) -
-        pnorm(std_gamma[, i - 1] - mu)
-    }
+    # start counting at 0
+    data$response <- as.integer(data$response) - 1
+  } else if (family == "gaussian") {
+    # do not use 'error' but sample directly from the latent distribution
+    data$response <- rnorm(data$mu, sum_psi)
+  } else if (family == "beta") {
+    # mean parameterization of the beta distribution
+    # do not use 'error' but sample directly from the latent distribution
+    pr <- stats::pnorm(data$mu / sum_psi)
+    data$response <- rbeta(length(pr), pr * data$disp, (1 - pr) * data$disp)
+    # truncate distribution at the extremes
+    data$response[data$response < 0.001] <- 0.001
+    data$response[data$response > 0.999] <- 0.999
   }
-  out
+  data
 }
 
 make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
                              comb_blocks = c("fixed", "random"),
-                             maxtrys_outer = 20, maxtrys_inner = 1e6) {
+                             maxtrys_outer = 100, maxtrys_inner = 1e6) {
   comb_blocks <- match.arg(comb_blocks)
   stopifnot((ntraits * nblocks_per_trait) %% nitems_per_block == 0L)
   if (comb_blocks == "fixed") {
@@ -266,25 +256,31 @@ make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
       }
     }
     out <- out[!remove, ]
-    possible_rows <- seq_len(nrow(out))
+    all_rows <- seq_len(nrow(out))
     nbpt_chosen <- rep(0, ntraits)
 
-    .choose <- function(nblocks, maxtrys) {
+    .choose <- function(nblocks, maxtrys, all_rows) {
       # finds suitable blocks
       chosen <- rep(NA, nblocks)
+      possible_rows <- all_rows
       i <- ntrys <- 1
       while (i <= nblocks && ntrys <= maxtrys) {
+        if (!length(possible_rows)) {
+          # all rows were selected already; start fresh
+          possible_rows <- all_rows
+        }
         ntrys <- ntrys + 1
         chosen[i] <- possible_rows[sample(seq_along(possible_rows), 1)]
         traits_chosen <- out[chosen[i], ]
         nbpt_chosen[traits_chosen] <- nbpt_chosen[traits_chosen] + 1
         valid <- max(nbpt_chosen) <= min(nbpt_chosen) + 1 &&
           !any(nbpt_chosen[traits_chosen] > nblocks_per_trait)
+        possible_rows <- setdiff(possible_rows, chosen[i])
         if (valid) {
-          possible_rows <- possible_rows[-chosen[i]]
           i <- i + 1
         } else {
           # revert number of blocks per trait chosen
+          # and try finding traits for block i again
           nbpt_chosen[traits_chosen] <- nbpt_chosen[traits_chosen] - 1
         }
       }
@@ -295,7 +291,8 @@ make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
     chosen <- rep(NA, nblocks)
     while (anyNA(chosen) && i <= maxtrys_outer) {
       i <- i + 1
-      chosen <- .choose(nblocks, maxtrys = maxtrys_inner)
+      chosen <- .choose(nblocks, maxtrys = maxtrys_inner,
+                        all_rows = all_rows)
     }
     if (anyNA(chosen)) {
       stop("Could not find a set of suitable blocks.")
@@ -306,7 +303,8 @@ make_trait_combs <- function(ntraits, nblocks_per_trait, nitems_per_block,
 }
 
 lambda2psi <- function(lambda) {
-  # according to Brown et al. 2011 for std lambda
+  # according to Brown et al. 2011 for std lambda: psi^2 = 1 - lambda^2
+  # psi is the SD and psi^2 is the variance
   # Ideas for lambda if unstandardized:
   # multiply std lambda with sqrt(2)
   # create simulated data based on std factor scores
@@ -315,7 +313,7 @@ lambda2psi <- function(lambda) {
     if (any(abs(x) > 1)) {
       stop("standardized lambdas are expect to be between -1 and 1.")
     }
-    1 - x^2
+    sqrt(1 - x^2)
   }
   if (is.list(lambda)) {
     psi <- lapply(lambda, .lambda2psi)

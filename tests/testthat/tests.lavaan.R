@@ -18,10 +18,16 @@ test_that("lavaan code for bernoulli responses works", {
   pr_names <- c("id", "trait", "estimate")
   expect_equal(names(pr), pr_names)
   expect_equal(length(unique(pr$id)), 100)
+
+  # test predictions for new data
+  new_sdata <- dplyr::filter(sdata, person %in% 1:5)
+  pr_new <- suppressWarnings(predict(fit, new_sdata))
+  expect_equal(names(pr_new), pr_names)
+  expect_equal(length(unique(pr_new$id)), 5)
 })
 
 test_that("lavaan code for gaussian responses works", {
-  set.seed(1234)
+  set.seed(12345)
   lambdas <- c(runif(6, 0.5, 1), runif(6, -1, -0.5))
   sdata <- sim_TIRT_data(
     npersons = 100,
@@ -38,4 +44,10 @@ test_that("lavaan code for gaussian responses works", {
   pr_names <- c("id", "trait", "estimate")
   expect_equal(names(pr), pr_names)
   expect_equal(length(unique(pr$id)), 100)
+
+  # test predictions for new data
+  new_sdata <- dplyr::filter(sdata, person %in% 1:5)
+  pr_new <- suppressWarnings(predict(fit, new_sdata))
+  expect_equal(names(pr_new), pr_names)
+  expect_equal(length(unique(pr_new$id)), 5)
 })
