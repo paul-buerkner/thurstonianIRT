@@ -1,6 +1,8 @@
 # thurstonianIRT 0.12.0
 
 * Switch to the latest `rstantools` toolchain.
+* Add a `gof` method to compute goodness-of-fit measures
+for lavaan-fitted models thanks to Angus Hughes. (#19)
 
 
 # thurstonianIRT 0.11.1
