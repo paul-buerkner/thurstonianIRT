@@ -18,6 +18,7 @@ test_that("lavaan code for bernoulli responses works", {
   pr_names <- c("id", "trait", "estimate")
   expect_equal(names(pr), pr_names)
   expect_equal(length(unique(pr$id)), 100)
+  expect_equal(names(gof(fit)), c("chi_sq", "df", "p_val", "RMSEA"))
 
   # test predictions for new data
   new_sdata <- dplyr::filter(sdata, person %in% 1:5)

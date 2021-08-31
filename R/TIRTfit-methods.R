@@ -95,10 +95,16 @@ gof.TIRTfit <- function(object, ...) {
     stop("gof.TIRTfit currently only works for lavaan fitted TIRT models.")
   }
 
-  # Extract chi_sq, N, and unadjusted DF
-  chi_sq <- object$fit@test$scaled.shifted$stat
+  # Extract N, chi_sq, and unadjusted DF
   N <- length(unique(object$data$person))
+  chi_sq <- object$fit@test$scaled.shifted$stat
+  if (is.null(chi_sq)) {
+    chi_sq <- NA
+  }
   df <- object$fit@test$scaled.shifted$df
+  if (is.null(df)) {
+    df <- NA
+  }
 
   # Get number of items per block to calculate redundancies
   blocks <- unique(object$data$block)
@@ -112,7 +118,7 @@ gof.TIRTfit <- function(object, ...) {
   df <- df - sum(redundancies)
   p_val <- 1 - pchisq(chi_sq, df)
   RMSEA <- ifelse(df > chi_sq, 0, sqrt((chi_sq - df)/(df * (N - 1))))
-  gof <- c(Chi_Sq = chi_sq, df = df, p_val = p_val, RMSEA = RMSEA)
+  gof <- c(chi_sq = chi_sq, df = df, p_val = p_val, RMSEA = RMSEA)
   gof
 }
 
