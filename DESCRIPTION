@@ -41,7 +41,7 @@ Imports:
     utils
 Suggests:
     testthat (>= 0.9.1),
-    markdown
+    rmarkdown
 LinkingTo: 
     BH (>= 1.66.0-1),
     Rcpp (>= 0.12.16),
