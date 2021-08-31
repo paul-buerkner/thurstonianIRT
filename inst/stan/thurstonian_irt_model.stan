@@ -1,8 +1,8 @@
 functions {
-#include /chunks/functions-cumulative_Phi_lpmf.stan
+#include /include/functions-cumulative_Phi_lpmf.stan
 }
 data {
-#include /chunks/data-shared.stan
+#include /include/data-shared.stan
 }
 transformed data {
   vector<lower=0>[N_item_fix] psi_fix;  // fixed item SDs
@@ -41,7 +41,7 @@ transformed parameters {
   r = psi .* z;
 }
 model {
-#include /chunks/model-likelihood.stan
+#include /include/model-likelihood.stan
   lambda_pos ~ normal(1, 0.5);
   lambda_neg ~ normal(-1, 0.5);
   psi_est ~ normal(1, 0.3);

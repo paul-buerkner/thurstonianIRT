@@ -1,8 +1,8 @@
 functions {
-#include /chunks/functions-cumulative_Phi_lpmf.stan
+#include /include/functions-cumulative_Phi_lpmf.stan
 }
 data {
-#include /chunks/data-shared.stan
+#include /include/data-shared.stan
   // fix item parameters and person hyperparameters
   // for predictions of parameters for new persons
   vector[N_item] lambda;  // item loadings
@@ -28,7 +28,7 @@ transformed parameters {
   eta = (L_trait * z_trait)';
 }
 model {
-#include /chunks/model-likelihood.stan
+#include /include/model-likelihood.stan
   to_vector(z_trait) ~ normal(0, 1);
 }
 generated quantities {
