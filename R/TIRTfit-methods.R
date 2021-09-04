@@ -110,13 +110,14 @@ gof.TIRTfit <- function(object, ...) {
   blocks <- unique(object$data$block)
   redundancies <- rep(NA, length(blocks))
   for (i in seq_along(blocks)) {
-    n_items <- nrow(unique(subset(object$data, block == blocks[i], select = itemC)))
+    sel_items <- unique(object$data$itemC[object$data$block == blocks[i]])
+    n_items <- length(sel_items)
     redundancies[i] <- n_items * (n_items - 1) * (n_items - 2) / 6
   }
 
   # Adjust the DF, p-value, and recalculate the RMSEA
   df <- df - sum(redundancies)
-  p_val <- 1 - pchisq(chi_sq, df)
+  p_val <- 1 - stats::pchisq(chi_sq, df)
   RMSEA <- ifelse(df > chi_sq, 0, sqrt((chi_sq - df)/(df * (N - 1))))
   gof <- c(chi_sq = chi_sq, df = df, p_val = p_val, RMSEA = RMSEA)
   gof

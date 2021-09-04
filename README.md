@@ -101,7 +101,7 @@ head(triplets_long)
 
 Finally, we can fit the model using several model fitting engines.
 Currently supported are [Stan](https://mc-stan.org/),
-[lavaan](http://lavaan.ugent.be/), and
+[lavaan](https://lavaan.ugent.be/), and
 [Mplus](http://www.statmodel.com/). Here, we choose Stan to fit the
 Thurstonian IRT model in a Bayesian framework.
 
