@@ -6,8 +6,10 @@ src-i386/
 src/init.o
 src/thurstonianIRT.dll
 src/stanExports_thurstonian_irt_model.o
+src/stanExports_thurstonian_irt_model.h
 src/stanExports_thurstonian_irt_model.hpp
 src/stanExports_thurstonian_irt_model_newdata.o
+src/stanExports_thurstonian_irt_model_newdata.h
 src/stanExports_thurstonian_irt_model_newdata.hpp
 CRAN-release
 cran-comments.md
