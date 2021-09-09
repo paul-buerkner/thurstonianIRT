@@ -82,13 +82,13 @@ sim_TIRT_data <- function(npersons, ntraits, lambda, gamma,
     traits <- trait_combs[i, ]
     trait1 <- rep_comp(traits, 1, nitems_per_block)
     trait2 <- rep_comp(traits, 2, nitems_per_block)
-    fblock <- (i - 1) * ncomparisons
+    fblock <- (i - 1) * nitems_per_block
     item1 <- match(trait1, traits) + fblock
     item2 <- match(trait2, traits) + fblock
     sign1 <- sign(lambda[item1])
     sign2 <- sign(lambda[item2])
     comparison <- data[data$block == i, ]$comparison
-    data[data$block == i, "itemC"] <- comparison + fblock
+    data[data$block == i, "itemC"] <- comparison + (i - 1) * ncomparisons
     data[data$block == i, "trait1"] <- trait1[comparison]
     data[data$block == i, "trait2"] <- trait2[comparison]
     data[data$block == i, "item1"] <- item1[comparison]
