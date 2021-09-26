@@ -1,3 +1,8 @@
+# thurstonianIRT 0.12.1
+
+* Fix data simulations via `sim_TIRT_data` for non-triplet formats.
+* Ensure compatibility with both rstan versions 2.21 and 2.26.
+
 # thurstonianIRT 0.12.0
 
 * Switch to the latest `rstantools` toolchain.
