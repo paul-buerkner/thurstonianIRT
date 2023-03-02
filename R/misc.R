@@ -141,3 +141,20 @@ deparse_combine <- function(x, max_char = 100) {
   }
   out
 }
+
+# check if a certain package is installed
+# @param package package name
+# @param version optional minimal version number to require
+require_package <- function(package, version = NULL) {
+  if (!requireNamespace(package, quietly = TRUE)) {
+    stop("Please install the '", package, "' package.")
+  }
+  if (!is.null(version)) {
+    version <- as.package_version(version)
+    if (utils::packageVersion(package) < version) {
+      stop("Please install package '", package,
+           "' version ", version, " or higher.")
+    }
+  }
+  invisible(TRUE)
+}

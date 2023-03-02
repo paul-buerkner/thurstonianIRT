@@ -227,6 +227,7 @@ make_lavaan_code <- function(data) {
 #'
 #' @export
 fit_TIRT_lavaan <- function(data, estimator = "ULSMV", ...) {
+  require_package("lavaan")
   lavaan_data <- make_sem_data(data)
   lavaan_model <- make_lavaan_code(data)
 
@@ -248,6 +249,7 @@ fit_TIRT_lavaan <- function(data, estimator = "ULSMV", ...) {
 
 # predict trait scores using lavaan
 predict_lavaan <- function(object, newdata = NULL, ...) {
+  require_package("lavaan")
   if (!is.null(newdata)) {
     # TODO: check 'newdata' for validity
     newdata <- make_sem_data(newdata)

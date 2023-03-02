@@ -263,6 +263,7 @@ make_mplus_code <- function(data, iter = 1000,
 #'
 #' @export
 fit_TIRT_mplus <- function(data, ...) {
+  require_package("MplusAutomation")
   file_name <- collapse(sample(0:9, 10, TRUE))
   mplus_data <- make_sem_data(data)
   mplus_model <- make_mplus_code(
