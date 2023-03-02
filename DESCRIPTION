@@ -2,8 +2,8 @@ Package: thurstonianIRT
 Encoding: UTF-8
 Type: Package
 Title: Thurstonian IRT Models
-Version: 0.12.1
-Date: 2021-09-26
+Version: 0.12.2
+Date: 2023-03-02
 Authors@R: c(person("Paul-Christian", "Bürkner", 
                     email = "paul.buerkner@gmail.com",
                     role = c("aut", "cre")),
@@ -27,9 +27,7 @@ Depends:
 Imports: 
     dplyr (>= 0.6.0),
     knitr,
-    lavaan (>= 0.6-1),
     magrittr,
-    MplusAutomation,
     mvtnorm,
     RcppParallel (>= 5.0.1),
     rlang,
@@ -40,6 +38,8 @@ Imports:
     tidyr,
     utils
 Suggests:
+    lavaan (>= 0.6-1),
+    MplusAutomation,
     testthat (>= 0.9.1),
     rmarkdown
 LinkingTo: 

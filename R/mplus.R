@@ -76,8 +76,8 @@ make_mplus_code <- function(data, iter = 1000,
   mplus_factor_correlations <- collapse(
     sapply(1:(ntraits - 1),
       function(i) paste0(
-        "trait", i, " WITH ",
-        paste0("trait", (i+1):ntraits, "*0", collapse = " "),
+        "trait", i, " WITH\n  ",
+        paste0("trait", (i+1):ntraits, "*0", collapse = "\n  "),
         ";\n"
       )
     )
