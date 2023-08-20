@@ -27,7 +27,7 @@ set.seed(1234)
 # thurstonianIRT
 
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.01662/status.svg)](https://doi.org/10.21105/joss.01662)
-[![Build Status](https://travis-ci.org/paul-buerkner/thurstonianIRT.svg?branch=master)](https://travis-ci.org/paul-buerkner/thurstonianIRT)
+[![Build Status](https://api.travis-ci.com/paul-buerkner/thurstonianIRT.svg?branch=master)](https://app.travis-ci.com/paul-buerkner/thurstonianIRT)
 [![CRAN Version](http://www.r-pkg.org/badges/version/thurstonianIRT)](https://cran.r-project.org/package=thurstonianIRT)
 
 ## Overview 
@@ -192,9 +192,9 @@ documentation.
 ## References
 
 Brown, A., & Maydeu-Olivares, A. (2011). Item response modeling of forced-choice questionnaires. *Educational and Psychological Measurement*, 71(3), 460-502.
-https://www.doi.org/10.1177/0013164410375112
+https://journals.sagepub.com/doi/10.1177/0013164410375112
 
 Brown, A., & Maydeu-Olivares, A. (2012). Fitting a Thurstonian IRT model to forced-choice data using Mplus. *Behavior Research Methods*, 44(4), 1135-1147.
-https://www.doi.org/10.3758/s13428-012-0217-x
+https://link.springer.com/article/10.3758/s13428-012-0217-x
 
-Bürkner P. C., Schulte N., & Holling H. (2019). On the Statistical and Practical Limitations of Thurstonian IRT Models. *Educational and Psychological Measurement.* https://www.doi.org/10.1177/0013164419832063
+Bürkner P. C., Schulte N., & Holling H. (2019). On the Statistical and Practical Limitations of Thurstonian IRT Models. *Educational and Psychological Measurement.* https://journals.sagepub.com/doi/10.1177/0013164419832063
