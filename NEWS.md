@@ -1,3 +1,7 @@
+# thurstonianIRT 0.12.3
+
+* Avoid a CRAN check warning.
+
 # thurstonianIRT 0.12.2
 
 * Fix line-length issues in Mplus code generation. (#34)
