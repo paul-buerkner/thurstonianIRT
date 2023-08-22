@@ -254,7 +254,7 @@ make_mplus_code <- function(data, iter = 1000,
 #'   format = "pairwise", family = "bernoulli", range = c(0, 1)
 #' )
 #'
-#' \donttest{
+#' \dontrun{
 #' # fit the data using Mplus
 #' fit <- fit_TIRT_mplus(triplets_long)
 #' print(fit)
