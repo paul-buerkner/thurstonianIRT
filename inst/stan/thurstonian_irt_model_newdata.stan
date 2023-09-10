@@ -10,7 +10,7 @@ data {
   vector[N_item] r;  // item random effects (residuals)
   // item thresholds depend on the family
   vector[family == 1 || family == 3 || family == 4 ? N_itemC : 0] gamma;
-  ordered[ncat - 1] gamma_ord[family == 2 ? N_itemC : 0];
+  array[family == 2 ? N_itemC : 0] ordered[ncat - 1] gamma_ord;
   // dispersion parameter of the beta family
   vector<lower=0>[family == 4 ? 1 : 0] disp;
   // cholesky factor of correlation matrix of traits

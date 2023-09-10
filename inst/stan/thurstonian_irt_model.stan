@@ -11,7 +11,7 @@ transformed data {
 parameters {
   // item thresholds depend on the family
   vector[family == 1 || family == 3 || family == 4 ? N_itemC : 0] gamma;
-  ordered[ncat - 1] gamma_ord[family == 2 ? N_itemC : 0];
+  array[family == 2 ? N_itemC : 0] ordered[ncat - 1] gamma_ord;
   vector<lower=0>[N_item_pos] lambda_pos;  // item loadings
   vector<upper=0>[N_item_neg] lambda_neg;  // item loadings
   vector<lower=0>[N_item_est] psi_est;  // estimated item SDs
