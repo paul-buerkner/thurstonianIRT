@@ -1,3 +1,8 @@
+# thurstonianIRT 0.12.4
+
+Fix issues with starting value syntax in lavaan models thanks to
+Yves Rosseel. (#42)
+
 # thurstonianIRT 0.12.3
 
 * Avoid a CRAN check warning.

@@ -39,12 +39,14 @@ make_lavaan_code <- function(data) {
   for (i in traits) {
     for (n in seq_len(nrow(data))) {
       if (data$trait1[n] == i) {
+        .modifiers <- c("start(1)", paste0("L", data$item1[n]))
         lav_loadings[[i]] <- c(lav_loadings[[i]], with(data,
-           paste0("start(1) * L", item1[n], " * i", item1[n], "i", item2[n])
+           paste0(.modifiers, " * i", item1[n], "i", item2[n])
         ))
       } else if (data$trait2[n] == i) {
+        .modifiers <- c("start(-1)", paste0("L", data$item2[n], "n"))
         lav_loadings[[i]] <- c(lav_loadings[[i]], with(data,
-           paste0("start(-1) * L", item2[n], "n * i", item1[n], "i", item2[n])
+           paste0(.modifiers, " * i", item1[n], "i", item2[n])
         ))
       }
     }
@@ -55,7 +57,7 @@ make_lavaan_code <- function(data) {
   }
   lav_loadings <- collapse(unlist(lav_loadings), "\n")
 
-  # fix factor varianaces to 1
+  # fix factor variances to 1
   lav_fix_factor_variances <-
     collapse("trait", traits, " ~~ 1 * trait", traits, "\n")
 
@@ -94,27 +96,30 @@ make_lavaan_code <- function(data) {
       pos_psi2 <- with(data, item2[n] == item2[m])
       neg_psi <- with(data, item2[n] == item1[m])
       if (pos_psi1) {
+        .modifiers <- c("start(1)", paste0("P", data$item1[n]))
         lav_cor_uniqueness <- with(data,
           paste0(lav_cor_uniqueness,
             "i", item1[n], "i", item2[n], " ~~ ",
-            "start(1) * P", item1[n],
-            " * i", item1[m], "i", item2[m], "\n"
+            paste0(.modifiers, " * i", item1[m], "i", item2[m], collapse = " + "),
+            "\n"
           )
         )
       } else if (pos_psi2) {
+        .modifiers <- c("start(1)", paste0("P", data$item2[n]))
         lav_cor_uniqueness <- with(data,
           paste0(lav_cor_uniqueness,
             "i", item1[n], "i", item2[n], " ~~ ",
-            "start(1) * P", item2[n],
-            " * i", item1[m], "i", item2[m], "\n"
+            paste0(.modifiers, " * i", item1[m], "i", item2[m], collapse = " + "),
+            "\n"
           )
         )
       } else if (neg_psi) {
+        .modifiers <- c("start(-1)", paste0("P", data$item2[n], "n"))
         lav_cor_uniqueness <- with(data,
           paste0(lav_cor_uniqueness,
             "i", item1[n], "i", item2[n], " ~~ ",
-            "start(-1) * P", item2[n], "n",
-            " * i", item1[m], "i", item2[m], "\n"
+            paste0(.modifiers, " * i", item1[m], "i", item2[m], collapse = " + "),
+            "\n"
           )
         )
       }
