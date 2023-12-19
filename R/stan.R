@@ -21,6 +21,7 @@
 #'
 #' @useDynLib thurstonianIRT, .registration = TRUE
 #' @import Rcpp
+#' @importFrom RcppParallel RcppParallelLibs
 #' @import methods
 #' @export
 make_stan_data <- function(data) {

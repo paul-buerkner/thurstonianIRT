@@ -26,7 +26,6 @@ Depends:
     methods
 Imports: 
     dplyr (>= 0.6.0),
-    knitr,
     magrittr,
     mvtnorm,
     RcppParallel (>= 5.0.1),
@@ -40,6 +39,7 @@ Imports:
     utils
 Suggests:
     MplusAutomation,
+    knitr,
     testthat (>= 0.9.1),
     rmarkdown
 LinkingTo: 
