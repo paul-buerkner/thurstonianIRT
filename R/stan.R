@@ -184,7 +184,7 @@ predict_stan_old_data <- function(object, ...) {
         id = as.integer(.data$id),
         trait = as.integer(.data$trait)
       ) %>%
-      select(-.data$par) %>%
+      select(-"par") %>%
       mutate(trait = as.character(factor(.data$trait, labels = traits))) %>%
       arrange(.data$id)
   }
