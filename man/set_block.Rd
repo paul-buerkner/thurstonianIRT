@@ -39,6 +39,18 @@ set_block(
   traits = c("A", "B", "C")
 )
 
+# Support items i1 and i4 were the same so that they have the same parameters
+set_block(
+  items = c("i1", "i2", "i3"),
+  traits = c("A", "B", "C"),
+  names = c("item1", "item2", "item3")
+) +
+set_block(
+  items = c("i4", "i5", "i6"),
+  traits = c("A", "B", "C"),
+  names = c("item1", "item5", "item6")
+)
+
 }
 \seealso{
 \code{\link{set_blocks_from_df}}
